@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Swamp
+Exec=swamp
+Type=Application
+Icon=swampapp
+Categories=Application
+StartupNotify=true
+#NoDisplay=true

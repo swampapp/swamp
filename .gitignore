@@ -1,0 +1,12 @@
+/swamp
+/swampd
+/swp
+/dist
+/tmp
+*~
+/internal/resources/res.gresource
+/internal/resources/swampd
+/#ui.glade#
+/.flatpak-builder
+/build
+/swamp.gz

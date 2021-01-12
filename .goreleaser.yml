@@ -1,0 +1,55 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - make swampd swp
+builds:
+  - id: "swamp"
+    binary: swamp 
+    ldflags: -s -w
+    goos:
+      - linux
+    goarch:
+      - amd64
+
+archives:
+  - id: default
+    builds:
+      - swamp 
+
+nfpms:
+  - builds:
+      - swamp
+    vendor: rubiojr 
+    homepage: "https://github.com/swampapp/swamp"
+    maintainer: "Sergio Rubio <sergio@rubio.im"
+    description: "Restic repository browser"
+    license: BSD 
+    contents:
+      - src: internal/resources/swamp.desktop
+        dst: /usr/share/applications/com.github.swampapp.desktop
+      - src: internal/resources/swampapp.png
+        dst: /usr/share/icons/swampapp.png
+      - src: swampd
+        dst: /usr/bin/swampd
+      - src: swp
+        dst: /usr/bin/swp
+    formats:
+      - deb
+    dependencies:
+      - mpv
+    bindir: /usr/bin
+
+signs:
+  - artifacts: checksum
+
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

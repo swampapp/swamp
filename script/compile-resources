@@ -1,0 +1,3 @@
+#!/bin/sh
+
+glib-compile-resources --target internal/resources/res.gresource res.xml

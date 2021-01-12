@@ -1,0 +1,22 @@
+app-id: org.flatpak.swampapp
+runtime: org.gnome.Platform
+runtime-version: '3.38'
+sdk: org.gnome.Sdk
+command: swamp
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --socket=session-bus
+  - --share=network
+  - --filesystem=xdg-documents
+  - --filesystem=home
+  - --talk-name=org.freedesktop.secrets
+modules:
+  - name: swamp
+    buildsystem: simple
+    build-commands:
+      - install -D swamp /app/bin/swamp
+    sources:
+      - type: file
+        path: swamp

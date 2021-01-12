@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+SCRIPT=$(readlink -f "$0")
+BASE_PATH="$(dirname "$SCRIPT")/.."
+
+unset RESTIC_REPOSITORY
+unset RESTIC_PASSWORD
+source "$BASE_PATH/script/creds"
+rm -rf "$RESTIC_REPOSITORY"
+restic init

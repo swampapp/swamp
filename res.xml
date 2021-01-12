@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+      <gresource prefix="/ui">
+            <file alias="behappy" compressed="true">images/behappy.jpg</file>
+            <file alias="stylesheet" compressed="true">internal/resources/style.css</file>
+
+            <!-- tagger -->
+            <file alias="tagger" compressed="true">internal/ui/tagger/tagger.glade</file>
+            <file alias="appmenu" compressed="true">internal/ui/appmenu/appmenu.glade</file>
+            <file alias="downloadlist" compressed="true">internal/ui/downloadlist/downloadlist.glade</file>
+            <file alias="inprogresslist" compressed="true">internal/ui/inprogresslist/inprogresslist.glade</file>
+            <file alias="taglist" compressed="true">internal/ui/taglist/taglist.glade</file>
+            <file alias="filelist" compressed="true">internal/ui/filelist/filelist.glade</file>
+            <file alias="mainwindow" compressed="true">internal/ui/mainwindow/mainwindow.glade</file>
+            <file alias="assistant" compressed="true">internal/ui/assistant/assistant.glade</file>
+            <file alias="settings" compressed="true">internal/ui/settings/settings.glade</file>
+            <file alias="indexer" compressed="true">internal/ui/indexer/indexer.glade</file>
+            <file alias="fileinfo" compressed="true">internal/ui/fileinfo/fileinfo.glade</file>
+      </gresource>
+
+      <gresource prefix="/images/dark">
+            <file compressed="true">images/dark/swamp.png</file>
+            <file alias="doc" compressed="false">images/dark/doc.png</file>
+            <file compressed="false">images/dark/search.png</file>
+            <file alias="downloading-animation" compressed="false">images/dark/loading.gif</file>
+            <file alias="status-indexing" compressed="false">images/dark/indexing.gif</file>
+            <file alias="status-downloading" compressed="false">images/dark/downloading.gif</file>
+            <file alias="indexing" compressed="false">images/dark/indexing-tile.gif</file>
+            <file alias="indexing-done" compressed="false">images/dark/done.png</file>
+            <file alias="assistant-background" compressed="false">images/dark/background.png</file>
+            <file alias="save" compressed="false">images/dark/save.png</file>
+
+            <file alias="type-document" compressed="false">images/dark/type-document.png</file>
+            <file alias="type-video" compressed="false">images/dark/type-video.png</file>
+            <file alias="type-audio" compressed="false">images/dark/type-audio.png</file>
+            <file alias="type-image" compressed="false">images/dark/type-image.png</file>
+            <file alias="type-compressed" compressed="false">images/dark/type-compressed.png</file>
+
+            <file compressed="false">images/dark/folder-download.svg</file>
+            <file compressed="false">images/dark/folder-favorites.svg</file>
+            <file compressed="false">images/dark/folder-search.svg</file>
+            <file compressed="false">images/dark/folder-progress.svg</file>
+            <file compressed="false">images/dark/folder-settings.svg</file>
+            <file alias="action-export" compressed="false">images/dark/action-export.svg</file>
+            <file alias="action-download" compressed="false">images/dark/download-action.svg</file>
+            <file alias="action-delete" compressed="false">images/dark/edit-delete.svg</file>
+            <file alias="action-favorite" compressed="false">images/dark/add-fav.svg</file>
+            <file alias="action-open" compressed="false">images/dark/action-open.svg</file>
+            <file alias="action-tag" compressed="false">images/dark/action-tag.svg</file>
+            <file alias="action-copy" compressed="false">images/dark/action-copy.svg</file>
+            <file alias="action-dupes" compressed="false">images/dark/action-dupes.svg</file>
+            <file alias="action-stream" compressed="false">images/dark/flash.svg</file>
+            <file alias="action-info" compressed="false">images/dark/action-info.svg</file>
+
+            <!-- appmenu -->
+            <file alias="ui/appmenu/in-progress.svg" compressed="true">images/dark/ui/appmenu/64/in-progress.svg</file>
+            <file alias="ui/appmenu/downloads.svg" compressed="true">images/dark/ui/appmenu/64/downloads.svg</file>
+            <file alias="ui/appmenu/tags.svg" compressed="true">images/dark/ui/appmenu/64/tags.svg</file>
+            <file alias="ui/appmenu/index.svg" compressed="true">images/dark/ui/appmenu/64/index.svg</file>
+            <file alias="ui/appmenu/settings.svg" compressed="true">images/dark/ui/appmenu/64/settings.svg</file>
+            <file alias="ui/appmenu/search.svg" compressed="true">images/dark/ui/appmenu/64/search.svg</file>
+
+            <!-- statusbar -->
+            <file alias="ui/statusbar/finished" compressed="true">images/dark/ui/statusbar/32/finished.svg</file>
+            <file alias="ui/statusbar/indexed" compressed="true">images/dark/ui/statusbar/32/indexed.svg</file>
+      </gresource>
+
+      <gresource prefix="/images/light">
+            <file alias="downloading-animation" compressed="false">images/light/loading.gif</file>
+            <file alias="status-indexing" compressed="false">images/light/indexing.gif</file>
+            <file alias="status-downloading" compressed="false">images/light/downloading.gif</file>
+            <file alias="indexing" compressed="false">images/light/indexing-tile.gif</file>
+            <file alias="swamp.png" compressed="true">images/light/swamp.png</file>
+            <file alias="search.png" compressed="false">images/light/search.png</file>
+            <file alias="indexing-done" compressed="false">images/light/done.png</file>
+            <file alias="save" compressed="false">images/light/save.png</file>
+            <file alias="doc" compressed="false">images/light/doc.png</file>
+
+            <file alias="type-document" compressed="false">images/light/type-document.png</file>
+            <file alias="type-video" compressed="false">images/light/type-video.png</file>
+            <file alias="type-audio" compressed="false">images/light/type-audio.png</file>
+            <file alias="type-image" compressed="false">images/light/type-image.png</file>
+            <file alias="type-compressed" compressed="false">images/light/type-compressed.png</file>
+
+            <file compressed="false">images/light/folder-download.svg</file>
+            <file compressed="false">images/light/folder-favorites.svg</file>
+            <file compressed="false">images/light/folder-search.svg</file>
+            <file compressed="false">images/light/folder-progress.svg</file>
+            <file compressed="false">images/light/folder-settings.svg</file>
+            <file alias="action-delete" compressed="false">images/light/edit-delete.svg</file>
+            <file alias="action-favorite" compressed="false">images/light/add-fav.svg</file>
+            <file alias="action-download" compressed="false">images/light/download-action.svg</file>
+            <file alias="action-open" compressed="false">images/light/action-open.svg</file>
+            <file alias="action-tag" compressed="false">images/light/action-tag.svg</file>
+            <file alias="action-copy" compressed="false">images/light/action-copy.svg</file>
+            <file alias="action-dupes" compressed="false">images/light/action-dupes.svg</file>
+            <file alias="action-stream" compressed="false">images/light/flash.svg</file>
+            <file alias="action-info" compressed="false">images/light/action-info.svg</file>
+            <file alias="action-export" compressed="false">images/light/action-export.svg</file>
+
+            <!-- appmenu -->
+            <file alias="ui/appmenu/in-progress.svg" compressed="true">images/light/ui/appmenu/64/in-progress.svg</file>
+            <file alias="ui/appmenu/downloads.svg" compressed="true">images/light/ui/appmenu/64/downloads.svg</file>
+            <file alias="ui/appmenu/tags.svg" compressed="true">images/light/ui/appmenu/64/tags.svg</file>
+            <file alias="ui/appmenu/index.svg" compressed="true">images/light/ui/appmenu/64/index.svg</file>
+            <file alias="ui/appmenu/settings.svg" compressed="true">images/light/ui/appmenu/64/settings.svg</file>
+            <file alias="ui/appmenu/search.svg" compressed="true">images/light/ui/appmenu/64/search.svg</file>
+
+            <!-- statusbar -->
+            <file alias="ui/statusbar/finished" compressed="true">images/light/ui/statusbar/32/finished.svg</file>
+            <file alias="ui/statusbar/indexed" compressed="true">images/light/ui/statusbar/32/indexed.svg</file>
+      </gresource>
+</gresources>
