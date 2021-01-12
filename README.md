@@ -103,7 +103,7 @@ The [quick start guide](docs/quickstart.md) will get you started with swamp. Don
 
 ### Building from source
 
-Needs Go 1.16, currently in beta.
+**Needs** [Go 1.16](https://golang.org/dl/#unstable), currently in beta.
 
 Install the required dependencies and run `make`:
 
