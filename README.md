@@ -111,3 +111,15 @@ Install the required dependencies and run `make`:
 sudo apt install build-essential libgtk-3-dev libcairo2-dev libglib2.0-dev libglib2.0-dev-bin
 make
 ```
+
+### Credits
+
+* [Restic](https://github.com/restic/restic) code is used by swamp via [RAPI](https://github.com/rubiojr/rapi)
+* [Bluge](https://github.com/blugelabs/bluge) powers repository indexing and search (via [rindex](https://github.com/rubiojr/rindex))
+* [Gotk3](https://github.com/gotk3/gotk3) is the graphical toolkit doing the pixel pushing
+* [Keyring](https://github.com/zalando/go-keyring) provides access to the GNOME keyring
+* A few libraries from the amazing [@muesli](https://github.com/muesli)
+* [Zerolog](https://github.com/rs/zerolog) for superb structured logging
+* [Go LevelDB](https://github.com/syndtr/goleveldb) to store out-of-the-index bits used by Swamp
+* [CLI](https://github.com/urfave/cli), my favorite command line parser
+* [Humanize](https://github.com/dustin/go-humanize) makes some numbers easily parseable by humans
