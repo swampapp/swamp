@@ -41,7 +41,6 @@ func InitResources() {
 	res, err := gio.LoadGResource(rpath)
 	gio.RegisterGResource(res)
 
-	copySwampd()
 	//copyIcon()
 	//copyDesktop()
 }
@@ -93,35 +92,6 @@ func copyIcon() {
 	if err != nil {
 		log.Error().Err(err).Msg("could not copy swampd icon")
 	}
-}
-
-func copySwampd() {
-	// Copy swampd to its destination
-	// FIXME: we can't do this if swampd is running, needs retry
-	rpath := filepath.Join(settings.BinDir(), "swampd")
-	os.MkdirAll(settings.BinDir(), 0755)
-	out, err := os.Create(rpath)
-	if err != nil {
-		log.Error().Err(err).Msg("error creating swampd target file")
-		return
-	}
-	defer out.Close()
-
-	//go:embed swampd
-	var swampdfs embed.FS
-	f, err := swampdfs.Open("swampd")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-
-	_, err = io.Copy(out, f)
-	if err != nil {
-		log.Error().Err(err).Msg("could not copy swampd binary")
-		return
-	}
-
-	os.Chmod(out.Name(), 0700)
 }
 
 func LoadImages() {

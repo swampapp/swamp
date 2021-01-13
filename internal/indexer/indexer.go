@@ -7,7 +7,6 @@ package indexer
 import (
 	"context"
 	"os/exec"
-	"path/filepath"
 	"sync"
 	"time"
 
@@ -89,9 +88,18 @@ func (i *Indexer) Start() {
 			log.Error().Err(err).Msg("indexer: error accessing the repository")
 		}
 
+		defer func() {
+			notifyStop()
+			log.Print("indexer: stopped swampd")
+		}()
+
 		if ok {
 			log.Print("indexer: starting swampd")
-			bin := filepath.Join(settings.BinDir(), "swampd")
+			bin, err := exec.LookPath("swampd")
+			if err != nil {
+				log.Error().Err(err).Msg("error finding swampd executable path")
+				return
+			}
 			log.Printf("indexer: %s %s %s %s", bin, "--index-path", settings.IndexPath(), "index")
 			cmd := exec.CommandContext(ctx, bin, "--index-path", settings.IndexPath(), "index")
 			out, err := cmd.CombinedOutput()
@@ -101,8 +109,6 @@ func (i *Indexer) Start() {
 		} else {
 			log.Debug().Msg("indexer: does not need indexing")
 		}
-		notifyStop()
-		log.Print("indexer: stopped swampd")
 	}()
 }
 
