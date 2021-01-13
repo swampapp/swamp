@@ -92,6 +92,14 @@ func New() *Assistant {
 					rs.Repository = ruri
 					rs.Var1 = var1
 					rs.Var2 = var2
+					err := rs.Save()
+					if err != nil {
+						msg := "could not save credentials in the keyring"
+						log.Error().Err(err).Msg(msg)
+						lbl.SetText("⚠️ " + msg)
+						return
+					}
+					log.Print("credentials saved")
 					a.SetPageComplete(page2, true)
 				})
 			}
@@ -103,12 +111,6 @@ func New() *Assistant {
 	})
 
 	a.Connect("apply", func(widget *gtk.Assistant) {
-		err := rs.Save()
-		if err != nil {
-			log.Error().Err(err).Msg("couldn't save settings")
-		} else {
-			log.Print("settings saved")
-		}
 		config.AddRepository(repoName, repoID, true)
 		widget.Hide()
 		if callback != nil {
