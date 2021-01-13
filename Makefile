@@ -6,14 +6,14 @@ all: ${BINNAME}
 
 ${BINNAME}: swampd swp
 	./script/compile-resources
-	go build -o ${BINNAME} 
+	go build -ldflags="-s -w" -o ${BINNAME}
 
 swampd:
-	go build -o swampd ./cmd/swampd
+	go build -ldflags="-s -w" -o swampd ./cmd/swampd
 	cp swampd internal/resources
 
 swp:
-	go build -o swp ./cmd/swp
+	go build -ldflags="-s -w" -o swp ./cmd/swp
 
 clean:
 	rm -f ${BINNAME} swampd
