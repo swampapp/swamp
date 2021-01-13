@@ -1,20 +1,40 @@
-type:video +demoscene
-type:audio
-type:document
-type:image
+# Swamp queries
 
-type:video +size:>100mb -> size > 100mb && (ext:mp4 || ext:mkv || ext:avi)
+The [search pane](docs/images/search.png) allows the user to use [Bleve](https://blevesearch.com/docs/Query-String-Query/) queries to find indexed repository files.
 
-* Videos that were modified during the last 7 days
+![](https://j.gifs.com/0YwooK@1164x602.gif)
 
-+modified:recently type:video
+It's a superset of that language, adding a few extensions (called **virtual fields**).
 
-* Files bigger than 1GB that were modified (or created) during the last 7 days
 
-+modified:recently +size:>1GB
+## Filtering by document type
 
-added:recently
-added:today
-added:yesterday
+Using the `type:` virtual field will search for files with a given document type, based on the file extension, not content.
 
-* explain "at least one" queries (without +), i.e. ext:pdf ext:doc
+* `type:video` will list `.mp4`, `.mkv`, `.avi`, etc available in the repository.
+* `type:audio` will list `.mp3`, `.ogg`, `.flac`, `.wav` etc
+* `type:image` will list `.png`, `.jpg`, `.gif`, `.tiff` etc
+* `type:document` will list `.doc`, `.odf`, `.rtf`, `.pdf` etc
+
+## Filtering by file size
+
+The `size:` field allows you to filter files by size (in bytes). It also accepts other file size units like `MB`, `KB`, `GB`, etc.
+
+The >, >=, <, and <= operators are accepted, for example:
+
+* `size:>= 10MB` will list files equal or bigger than 10MB.
+* It can be combined with other filters. For example, `size:>1GB ext:mp4` will list mp4 files bigger than 1GB.
+
+## Filtering by modification time
+
+The `modified:` virtual field will allow you to find files that have been modified `today`, `yesterday` or `recently` (last 15 days). Modified is the `mtime` of the file when it was backed up, that is, the time when the file was last modified before it was backed up by restic.
+
+For example:
+
+`modified:recently ext:mp4` will list all the mp4 video files that have been modified over the last 15 days.
+
+`modified:recently +size:>1Gb` will list all the recently modified files bigger than 1GB.
+
+## Filtering by indexing time
+
+The `added:` virtual field is similar to the `modified:` virtual field, but matches the time when the file was indexed. Currently supports `today`, `yesterday`, `recently`.
