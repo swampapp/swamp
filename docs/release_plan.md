@@ -24,3 +24,4 @@ From a developer point of view:
 * Better error handling and error reporting throughout the entire code base. Most errors need to be surfaced correctly for the user to see. The status package and UI will probably need to be rewritten as a result.
 * Most of the backend code needs unit/integration tests and CI needs to be added
 * Backend code for the indexer (`indexer` package) and downloader (`downloader` package) needs to be refactored.
+* Refactor [the queries package](https://github.com/swampapp/swamp/issues/7).
