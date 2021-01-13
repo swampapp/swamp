@@ -4,4 +4,4 @@ set -e
 goreleaser release --skip-publish --rm-dist --skip-validate --snapshot
 
 echo "Installing the package..."
-sudo apt install -y ./dist/*.deb
+sudo apt --reinstall install -y ./dist/*.deb
