@@ -4,6 +4,14 @@
 
 The app is currently a proof of concept.
 
+Swamp will go through a number of alpha releases before reaching its beta quality status.
+
+Alpha status generally means it's missing important features and high severity or critical bugs are still present, usually as a result of proof of concept code being added. During the alpha period, on-disk data structures/format may also change, forcing the user to start reset the local state if no data migrations are added.
+
+Once the app is considered stable enough and has no (known) high severity or critical bugs, Swamp will move to a beta status. Strong QA (manual or automated), polishing and documentation will reign the beta period. Only fixes for existing bugs that don't require large code changes will be merged.
+
+Progress is being tracked using the [the 1.0 milestone page](https://github.com/swampapp/swamp/milestone/1).
+
 **From a user point of view**, the app is mostly functional, with a few missing features will be implemented before the 1.0 release:
 
 * [A graphical user interface](https://github.com/swampapp/swamp/issues/1) to manage preferences
