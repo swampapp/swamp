@@ -85,7 +85,6 @@ func New() *Assistant {
 				})
 			} else {
 				glib.IdleAdd(func() {
-					lbl.SetMarkup("👍 It worked! Click <b>Next</b> to finish the configuration.")
 					repoID = repo.Config().ID
 					rs = resticsettings.New(repoID)
 					rs.Password = rpass
@@ -99,6 +98,7 @@ func New() *Assistant {
 						lbl.SetText("⚠️ " + msg)
 						return
 					}
+					lbl.SetMarkup("👍 It worked! Click <b>Next</b> to finish the configuration.")
 					log.Print("credentials saved")
 					a.SetPageComplete(page2, true)
 				})
