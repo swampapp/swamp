@@ -4,7 +4,7 @@
 
 The app is currently a proof of concept.
 
-From a user point of view, the app is mostly functional, with a few missing features will be implemented before the 1.0 release:
+**From a user point of view**, the app is mostly functional, with a few missing features will be implemented before the 1.0 release:
 
 * [A graphical user interface](https://github.com/swampapp/swamp/issues/1) to manage preferences
 * [An updated indexer pane](https://github.com/swampapp/swamp/issues/2)
@@ -13,7 +13,17 @@ From a user point of view, the app is mostly functional, with a few missing feat
 * [Export downloaded files](https://github.com/swampapp/swamp/issues/5)
 * [Quick start guide](https://github.com/swampapp/swamp/issues/6)
 
-From a developer point of view:
+**From a data safety perspective**, Swamp doesn't change your Restic repository, it can work with read-only repositories.
+
+Swamp stores three types of data locally:
+
+* The index: can be deleted and recreated if necessary, any time, so data quality bugs that may happen when indexing (`~/.local/share/com.github.swampapp/repositories/<repo ID>/index`)
+* Downloaded files: Swamp can download repository files locally, when instructed to do so. The worst thing that can happen is that you may need to re-download them, if something goes wrong (shared across repos in `~/.local/share/com.github.swampapp/downloads`).
+* Tags: this is the only user data that can't be recreated right now. Currently stored in `~/.local/share/com.github.swampapp/repositories/<repo ID>/tags.db`, can be safely backed up when the app is closed.
+
+So the tags database is the only user data worth saving if you need to start from scratch to test things.
+
+**From a developer point of view:**
 
 * The component model needs to be solidified and documented, including:
   * How to add new components with optional Glade files
