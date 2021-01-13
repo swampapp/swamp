@@ -4,6 +4,8 @@
 
 A GNOME application to index, search, stream, download and export files in [Restic](https://restic.net) repositories.
 
+[Quick start guide](docs/quickstart.md).
+
 **⚠️ Currently alpha quality:**
 
 * [Ubuntu Desktop 20.04](https://releases.ubuntu.com/20.04) (with GNOME) is the only environment currently supported
@@ -97,7 +99,7 @@ Swamp includes a command line interface (`swp`) to query the repositories after 
 
 ## Quick Start Guide
 
-The [quick start guide](docs/quickstart.md) will get you started with swamp. Don't worry, if you already know Restic this will be a walk in the park.
+The [quick start guide](docs/quickstart.md) will get you started with swamp. Don't worry, if you already know Restic, this will be a walk in the park.
 
 ## Developer resources
 
