@@ -2,11 +2,11 @@
 
 # Swamp
 
-A GNOME application to index, search, stream, download and export files in Restic repositories.
+A GNOME application to index, search, stream, download and export files in [Restic](https://restic.net) repositories.
 
 **⚠️ Currently alpha quality:**
 
-* Ubuntu 20.04 (with GNOME) is the only environment currently supported
+* [Ubuntu Desktop 20.04](https://releases.ubuntu.com/20.04) (with GNOME) is the only environment currently supported
 * It may crash often
 * It may behave unreliably
 * The on-disk data and index format may change before the final release, and data migration isn't guaranteed, forcing you to re-index your repositories eventually
@@ -14,7 +14,7 @@ A GNOME application to index, search, stream, download and export files in Resti
 * Large chunks of the code are still in a PoC state and may lack readability, proper error handling or reporting
 * Some functionality is still missing
 
-There's a more comprehensive overview of what's missing for those technically inclined or willing to contribute in the [release plan document](docs/release_plan.md)
+There's a more comprehensive overview of what's missing for those technically inclined or willing to contribute in the [release plan document](docs/release_plan.md).
 
 ## Features
 
