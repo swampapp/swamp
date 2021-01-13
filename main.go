@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"sync"
@@ -17,6 +18,13 @@ import (
 var singleInstance sync.Once
 
 func main() {
+	for _, a := range os.Args {
+		if a == "-v" || a == "--version" {
+			fmt.Println("Swamp v" + APP_VERSION)
+			os.Exit(0)
+		}
+	}
+
 	resources.InitResources()
 
 	statsviz.RegisterDefault()

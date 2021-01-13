@@ -9,7 +9,6 @@ require (
 	github.com/Jeffail/tunny v0.0.0-20190930221602-f13eb662a36a
 	github.com/arl/statsviz v0.2.3-0.20210106210000-ead6537275f7
 	github.com/blugelabs/bluge v0.1.4-0.20201021190638-c304a6733af6
-	github.com/blugelabs/query_string v0.1.0 // indirect
 	github.com/briandowns/spinner v1.11.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gotk3/gotk3 v0.5.2-0.20201210053409-82632d18c6e1

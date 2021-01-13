@@ -77,15 +77,12 @@ github.com/blevesearch/segment v0.9.0 h1:5lG7yBCx98or7gK2cHMKPukPZ/31Kag7nONpoBt
 github.com/blevesearch/segment v0.9.0/go.mod h1:9PfHYUdQCgHktBgvtUOF4x+pc4/l8rdH0u5spnW85UQ=
 github.com/blevesearch/snowballstem v0.9.0 h1:lMQ189YspGP6sXvZQ4WZ+MLawfV8wOmPoD/iWeNXm8s=
 github.com/blevesearch/snowballstem v0.9.0/go.mod h1:PivSj3JMc8WuaFkTSRDW2SlrulNWPl4ABg1tC/hlgLs=
-github.com/blugelabs/bluge v0.1.1/go.mod h1:Ah8c1+vYuQiL26j2SXwyt2OPQhcE75q9LTtUVQx0hYA=
 github.com/blugelabs/bluge v0.1.4-0.20201021190638-c304a6733af6 h1:tndTLZtPsTjwKvKr5J6S6zIcjzhMAv8PsHfRmNbMuW4=
 github.com/blugelabs/bluge v0.1.4-0.20201021190638-c304a6733af6/go.mod h1:Ah8c1+vYuQiL26j2SXwyt2OPQhcE75q9LTtUVQx0hYA=
 github.com/blugelabs/bluge_segment_api v0.1.0 h1:Z+rj+KYLpdblTAYSjBsuNC79dHB3Oc5exuDBEyAGPnk=
 github.com/blugelabs/bluge_segment_api v0.1.0/go.mod h1:tV1dxZRn5KUxlghf8qWwDs05TdcxaiW+TkXecb7nt54=
 github.com/blugelabs/ice v0.1.1 h1:H4EpKdiFSKKLMo0CLl4keCdHFEQIF+sMMUEds7SQBQs=
 github.com/blugelabs/ice v0.1.1/go.mod h1:qTvShx0ZvYCzF9r5yaHH9lA8a7S34f5xJILlMV/CnlU=
-github.com/blugelabs/query_string v0.1.0 h1:Yx6kdTvLR0x5YGQ3EXL+JHxYrprSytelVwV/oSw/wXw=
-github.com/blugelabs/query_string v0.1.0/go.mod h1:7YNC89WcILyoHNibe+iswtEyjC2Lr5kSJ5JPhKXm/4E=
 github.com/briandowns/spinner v1.11.1 h1:OixPqDEcX3juo5AjQZAnFPbeUA0jvkp2qzB5gOZJ/L0=
 github.com/briandowns/spinner v1.11.1/go.mod h1:QOuQk7x+EaDASo80FEXwlwiA+j/PPIcX3FScO+3/ZPQ=
 github.com/caio/go-tdigest v3.1.0+incompatible h1:uoVMJ3Q5lXmVLCCqaMGHLBWnbGoN6Lpu7OAUPR60cds=
@@ -180,7 +177,6 @@ github.com/golang/protobuf v1.4.0/go.mod h1:jodUvKwWbYaEsadDk5Fwe5c77LiNKVO9IDvq
 github.com/golang/protobuf v1.4.1/go.mod h1:U8fpvMrcmy5pZrNK1lt4xCsGvpyWQ/VVv6QDs8UjoX8=
 github.com/golang/protobuf v1.4.2 h1:+Z5KGCizgyZCbGh1KZqA0fcLLkwbsjIzS4aV2v7wJX0=
 github.com/golang/protobuf v1.4.2/go.mod h1:oDoupMAO8OvCJWAcko0GGGIgR6R6ocIYbsSw735rRwI=
-github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/golang/snappy v0.0.1 h1:Qgr9rKW7uDUkrbSmQeiDsGa8SjGyCOGtuasMWwvp2P4=
 github.com/golang/snappy v0.0.1/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
@@ -301,11 +297,9 @@ github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLA
 github.com/nxadm/tail v1.4.4 h1:DQuhQpB1tVlglWS2hLQ5OV6B5r8aGxSrPc5Qo6uTN78=
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
-github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.12.1/go.mod h1:zj2OWP4+oCPe1qIXoGWkgMRwljMUYCdkwsT2108oapk=
 github.com/onsi/ginkgo v1.14.0 h1:2mOpI4JVVPBN+WQRa0WKH2eXR+Ey+uK4n7Zj0aYpIQA=
 github.com/onsi/ginkgo v1.14.0/go.mod h1:iSB4RoI2tjJc9BBv4NKIKWKya62Rps+oPG/Lv9klQyY=
-github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
 github.com/onsi/gomega v1.7.1/go.mod h1:XdKZgCCFLUoM/7CFJVPcG8C1xQ1AJ0vpAezJrB7JYyY=
 github.com/onsi/gomega v1.10.1 h1:o0+MgICZLuZ7xjH7Vx6zS/zcu93/BEp1VwkIW1mEXCE=
 github.com/onsi/gomega v1.10.1/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1ybHNo=
@@ -332,11 +326,8 @@ github.com/rs/zerolog v1.20.1-0.20201129091356-29d8dac5e875 h1:ZQUWz11dnzdKJh10s
 github.com/rs/zerolog v1.20.1-0.20201129091356-29d8dac5e875/go.mod h1:IzD0RJ65iWH0w97OQQebJEvTZYvsCUm9WVLWBQrJRjo=
 github.com/rubiojr/gotk3 v0.6.0 h1:zA4l1799XuJGXsCNhkvCP/dGvZJ4Vb3O7fSwFcQKFQo=
 github.com/rubiojr/gotk3 v0.6.0/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
-github.com/rubiojr/rapi v0.0.0-20201208211132-2b65f0269862/go.mod h1:Ft+bi8loIdZ4C9AcPVFPlNXh9rVkBMLWgQGQhNL+CaE=
 github.com/rubiojr/rapi v0.0.0-20201230200601-5ed59be0451f h1:VanA3c939PVRauBr3dNxUiqNgKEyFMEYk/acousRI0A=
 github.com/rubiojr/rapi v0.0.0-20201230200601-5ed59be0451f/go.mod h1:Ft+bi8loIdZ4C9AcPVFPlNXh9rVkBMLWgQGQhNL+CaE=
-github.com/rubiojr/rindex v0.0.0-20201209150403-37a04a442a71 h1:EX6o/NtfgmbHKIhMOPzExU9F95wDunzutSE5tgG7gV0=
-github.com/rubiojr/rindex v0.0.0-20201209150403-37a04a442a71/go.mod h1:LA6eSMQYPMWMUXEZ6+20T5E7YMeRTSiy3TGtNvYu+DY=
 github.com/rubiojr/rindex v0.0.0-20210107154643-bee681911741 h1:PAnrv+aKSRv7KntHmwNNo751oujWeRa64/x9e5GUwuA=
 github.com/rubiojr/rindex v0.0.0-20210107154643-bee681911741/go.mod h1:tEevXY1gMjG+se+9v4Ke7i0oNVxzw2b5yMeojzIsPbQ=
 github.com/russross/blackfriday v1.5.2 h1:HyvC0ARfnZBqnXwABFeSZHpKvJHJJfPz81GNueLj0oo=
@@ -368,7 +359,6 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd0=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
 github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca h1:Ld/zXl5t4+D69SiV4JoN7kkfvJdOWlPpfxrzxpLMoUk=
 github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca/go.mod h1:u2MKkTVTVJWe5D1rCvame8WqhBd88EuIwODJZ1VHCPM=
 github.com/tinylib/msgp v1.1.0 h1:9fQd+ICuRIu/ue4vxJZu6/LzxN0HwMds2nq/0cFvxHU=
@@ -705,7 +695,6 @@ gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 h1:uRGJdciOHaEIrze2W8Q3AKkep
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7/go.mod h1:dt/ZhP58zS4L8KSrWDmTeBkI65Dw0HsyUHuEVlX15mw=
 gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637 h1:yiW+nvdHb9LVqSHQBXfZCieqV4fzYhNBql77zY0ykqs=
 gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637/go.mod h1:BHsqpu/nsuzkT5BpiH1EMZPLyqSMM8JbIavyFACoFNk=
-gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.4/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.8/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
