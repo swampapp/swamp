@@ -29,7 +29,7 @@ nfpms:
       - src: internal/resources/swamp.desktop
         dst: /usr/share/applications/com.github.swampapp.desktop
       - src: internal/resources/swampapp.png
-        dst: /usr/share/icons/swampapp.png
+        dst: /usr/share/pixmaps/swampapp.png
       - src: swampd
         dst: /usr/bin/swampd
       - src: swp
