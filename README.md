@@ -114,7 +114,7 @@ The [quick start guide](docs/quickstart.md) will get you started with swamp. Don
 Install the required dependencies and run `make`:
 
 ```
-sudo apt install build-essential libgtk-3-dev libcairo2-dev libglib2.0-dev libglib2.0-dev-bin
+sudo apt install build-essential libgtk-3-dev libcairo2-dev libglib2.0-dev libglib2.0-dev-bin upx
 make
 ```
 
