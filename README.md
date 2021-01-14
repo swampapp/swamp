@@ -28,6 +28,10 @@ Swamp doesn't write to your Restic repository. It works just fine with read-only
 
 The GNOME keyring is the place where the repository credentials are stored. Other features like [MPRIS](https://specifications.freedesktop.org/mpris-spec/latest/) (to play media files) and [UPower](https://upower.freedesktop.org/) (to prevent the indexing process when on battery) are planed.
 
+Dark/Light themes are also supported.
+
+![](docs/images/dark-light.png)
+
 ### Supports any Restic backend
 
 Swamp is powered by [Restic](https://restic.net), meaning that it can index and search S3, Rest Server, local, rclone backends, etc. (Limited to S3, local and rest in the current alpha version)
