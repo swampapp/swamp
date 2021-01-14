@@ -105,22 +105,22 @@ func (a *AppMenu) setup() {
 	scaleFactor := a.treeView.GetScaleFactor()
 	var imageTags, imageSearch, imageSettings, imageStatus, imageDownloaded, imageInProgress *gdk.Pixbuf
 
+	// HiDPI hack while the required cairo stuff is missing in gotk3
+	// See https://gitlab.gnome.org/GNOME/gtk/-/issues/613
 	if scaleFactor == 1 {
-		imageTags = resources.Pixbuf("ui/appmenu/tags.svg")
-		imageSettings = resources.Pixbuf("ui/appmenu/settings.svg")
-		imageStatus = resources.Pixbuf("ui/appmenu/index.svg")
-		imageSearch = resources.Pixbuf("ui/appmenu/search.svg")
-		imageDownloaded = resources.Pixbuf("ui/appmenu/downloads.svg")
-		imageInProgress = resources.Pixbuf("ui/appmenu/in-progress.svg")
+		imageTags = resources.ScaledPixbuf(48, 48, "ui/appmenu/tags.svg")
+		imageSettings = resources.ScaledPixbuf(48, 48, "ui/appmenu/settings.svg")
+		imageStatus = resources.ScaledPixbuf(48, 48, "ui/appmenu/index.svg")
+		imageSearch = resources.ScaledPixbuf(48, 48, "ui/appmenu/search.svg")
+		imageDownloaded = resources.ScaledPixbuf(48, 48, "ui/appmenu/downloads.svg")
+		imageInProgress = resources.ScaledPixbuf(48, 48, "ui/appmenu/in-progress.svg")
 	} else {
-		// HiDPI hack while the required cairo stuff is missing in gotk3
-		// See https://gitlab.gnome.org/GNOME/gtk/-/issues/613
-		imageTags = resources.ScaledPixbuf(64, 64, "ui/appmenu/tags.svg")
-		imageSettings = resources.ScaledPixbuf(64, 64, "ui/appmenu/settings.svg")
-		imageStatus = resources.ScaledPixbuf(64, 64, "ui/appmenu/index.svg")
-		imageSearch = resources.ScaledPixbuf(64, 64, "ui/appmenu/search.svg")
-		imageDownloaded = resources.ScaledPixbuf(64, 64, "ui/appmenu/downloads.svg")
-		imageInProgress = resources.ScaledPixbuf(64, 64, "ui/appmenu/in-progress.svg")
+		imageTags = resources.ScaledPixbuf(42, 42, "ui/appmenu/tags.svg")
+		imageSettings = resources.ScaledPixbuf(42, 42, "ui/appmenu/settings.svg")
+		imageStatus = resources.ScaledPixbuf(42, 42, "ui/appmenu/index.svg")
+		imageSearch = resources.ScaledPixbuf(42, 42, "ui/appmenu/search.svg")
+		imageDownloaded = resources.ScaledPixbuf(42, 42, "ui/appmenu/downloads.svg")
+		imageInProgress = resources.ScaledPixbuf(42, 42, "ui/appmenu/in-progress.svg")
 	}
 
 	// Add some rows to the list store
