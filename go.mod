@@ -1,6 +1,6 @@
 module github.com/swampapp/swamp
 
-go 1.15
+go 1.16
 
 replace github.com/gotk3/gotk3 => github.com/rubiojr/gotk3 v0.6.0
 
