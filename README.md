@@ -1,4 +1,4 @@
-![](docs/images/swampapp.png)
+![](docs/images/banner.jpg)
 
 # Swamp
 
@@ -120,7 +120,7 @@ make
 
 ### Credits
 
-* Awesome logo from [@blackirin](https://github.com/blackirin)
+* Awesome logos from [@blackirin](https://github.com/blackirin)
 * Animated gifs from [loading.io](https://loading.io)
 * Application icons ([Qogir](https://github.com/vinceliuice/Qogir-icon-theme), [Tela](https://github.com/vinceliuice/Tela-icon-theme), [We10x](https://github.com/yeyushengfan258/We10X-icon-theme), [Infinity Lavender](https://www.gnome-look.org/p/1457365), [McMuse](https://github.com/yeyushengfan258/McMuse-icon-theme))
 * [Restic](https://github.com/restic/restic) code is used by swamp via [RAPI](https://github.com/rubiojr/rapi)
