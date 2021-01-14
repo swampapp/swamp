@@ -115,12 +115,12 @@ func (a *AppMenu) setup() {
 	} else {
 		// HiDPI hack while the required cairo stuff is missing in gotk3
 		// See https://gitlab.gnome.org/GNOME/gtk/-/issues/613
-		imageTags = resources.ScaledPixbuf(64, 64, "ui/appmenu/tags.svg")
-		imageSettings = resources.ScaledPixbuf(64, 64, "ui/appmenu/settings.svg")
-		imageStatus = resources.ScaledPixbuf(64, 64, "ui/appmenu/index.svg")
-		imageSearch = resources.ScaledPixbuf(64, 64, "ui/appmenu/search.svg")
-		imageDownloaded = resources.ScaledPixbuf(64, 64, "ui/appmenu/downloads.svg")
-		imageInProgress = resources.ScaledPixbuf(64, 64, "ui/appmenu/in-progress.svg")
+		imageTags = resources.ScaledPixbuf(32, 32, "ui/appmenu/tags.svg")
+		imageSettings = resources.ScaledPixbuf(32, 32, "ui/appmenu/settings.svg")
+		imageStatus = resources.ScaledPixbuf(32, 32, "ui/appmenu/index.svg")
+		imageSearch = resources.ScaledPixbuf(32, 32, "ui/appmenu/search.svg")
+		imageDownloaded = resources.ScaledPixbuf(32, 32, "ui/appmenu/downloads.svg")
+		imageInProgress = resources.ScaledPixbuf(32, 32, "ui/appmenu/in-progress.svg")
 	}
 
 	// Add some rows to the list store
