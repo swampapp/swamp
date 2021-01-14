@@ -2,7 +2,7 @@ env:
   - GO111MODULE=on
 before:
   hooks:
-    - make swampd swp
+    - make
 builds:
   - id: "swamp"
     binary: swamp 
@@ -11,6 +11,8 @@ builds:
       - linux
     goarch:
       - amd64
+    hooks:
+      post: upx --force swamp swp swampd
 
 archives:
   - id: default

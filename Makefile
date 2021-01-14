@@ -4,22 +4,23 @@ BINNAME=swamp
 
 all: ${BINNAME}
 
+release: swampd swamp swp
+	upx --force swamp
+	upx --force swampd
+	upx --force swp
+
 ${BINNAME}: swampd swp
 	./script/compile-resources
 	go build -ldflags="-s -w" -o ${BINNAME}
-	upx --force swamp
 
 swampd:
 	go build -ldflags="-s -w" -o swampd ./cmd/swampd
-	upx --force swampd
-	cp swampd internal/resources
 
 swp:
 	go build -ldflags="-s -w" -o swp ./cmd/swp
-	upx --force swp
 
 clean:
-	rm -f ${BINNAME} swampd
+	rm -f ${BINNAME} swampd swp
 
 test: ${BINNAME}
 	./script/test
