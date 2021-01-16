@@ -11,7 +11,7 @@ release: swampd swamp swp
 
 ${BINNAME}: swampd swp
 	./script/compile-resources
-	go build -ldflags="-s -w" -o ${BINNAME}
+	go build -ldflags="-s -w -X 'main.GIT_SHA=$(shell git rev-parse --short HEAD)'" -o ${BINNAME}
 
 swampd:
 	go build -ldflags="-s -w" -o swampd ./cmd/swampd

@@ -20,7 +20,7 @@ var singleInstance sync.Once
 func main() {
 	for _, a := range os.Args {
 		if a == "-v" || a == "--version" {
-			fmt.Println("Swamp v" + APP_VERSION)
+			fmt.Printf("Swamp v%s (%s)\n", APP_VERSION, GIT_SHA)
 			os.Exit(0)
 		}
 	}
