@@ -103,6 +103,10 @@ sudo apt install build-essential libgtk-3-dev libcairo2-dev libglib2.0-dev libgl
 make
 ```
 
+### Architecture
+
+See [architecture.md](docs/architecture.md)
+
 ### Credits
 
 * Awesome logos from [@blackirin](https://github.com/blackirin)
