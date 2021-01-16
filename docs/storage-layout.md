@@ -1,6 +1,6 @@
 # Storage layout
 
-## configuration directory
+## Configuration directory
 
 Lives under `$HOME/.config/com.githubapp.swamp`.
 
