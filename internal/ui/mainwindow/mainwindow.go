@@ -80,8 +80,7 @@ func New(a *gtk.Application) (*MainWindow, error) {
 
 	w.SetTitle("Swamp")
 	w.SetDefaultSize(1024, 600)
-	img, _ := gtk.ImageNewFromResource("/swamp/images/swamp.png")
-	w.SetIcon(img.GetPixbuf())
+	w.SetIcon(resources.Pixbuf("appicon"))
 	w.Connect("key-press-event", func(tree *gtk.ApplicationWindow, ev *gdk.Event) bool {
 		kp := gdk.EventKeyNewFromEvent(ev)
 		cntrlMask := uint(gdk.CONTROL_MASK)

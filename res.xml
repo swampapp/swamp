@@ -19,7 +19,7 @@
       </gresource>
 
       <gresource prefix="/images/dark">
-            <file compressed="true">images/dark/swamp.png</file>
+            <file alias="appicon" compressed="false">internal/resources/swampapp.png</file>
             <file alias="doc" compressed="false">images/dark/doc.png</file>
             <file compressed="false">images/dark/search.png</file>
             <file alias="downloading-animation" compressed="false">images/dark/loading.gif</file>
@@ -66,11 +66,11 @@
       </gresource>
 
       <gresource prefix="/images/light">
+            <file alias="appicon" compressed="false">internal/resources/swampapp.png</file>
             <file alias="downloading-animation" compressed="false">images/light/loading.gif</file>
             <file alias="status-indexing" compressed="false">images/light/indexing.gif</file>
             <file alias="status-downloading" compressed="false">images/light/downloading.gif</file>
             <file alias="indexing" compressed="false">images/light/indexing-tile.gif</file>
-            <file alias="swamp.png" compressed="true">images/light/swamp.png</file>
             <file alias="search.png" compressed="false">images/light/search.png</file>
             <file alias="indexing-done" compressed="false">images/light/done.png</file>
             <file alias="save" compressed="false">images/light/save.png</file>
