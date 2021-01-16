@@ -2,7 +2,7 @@
 
 The [search pane](docs/images/search.png) allows the user to use [Bleve](https://blevesearch.com/docs/Query-String-Query/) queries to find indexed repository files.
 
-![](https://j.gifs.com/0YwooK@1164x602.gif)
+![](images/swamp-search.gif)
 
 It's a superset of that language, adding a few extensions (called **virtual fields**).
 

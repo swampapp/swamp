@@ -56,7 +56,7 @@ And much more. See the ![query language tutorial](docs/queries.md) for some addi
 
 Capable of indexing 1000+ files per second in a regular laptop. Polls for new Restic snapshots regularly to index them automatically.
 
-![](https://j.gifs.com/gZRMll@512x300.gif)
+![](docs/images/swamp-index.gif)
 
 ### Tagger
 
