@@ -1,16 +1,18 @@
 # Keyboard shortcuts
 
-## Global
+## Global shortcuts (from any panel)
 
-* Ctrl-f: Search for files
+* **Ctrl-f:** open the search panel
 
-## Search View
+## Search panel
 
-* Ctrl-d: download selected files
-* Ctrl-s: stream selected file
-* Ctrl-o: download and open selected files
-* Ctrol-t: tag selected file
+* **Ctrl-d:** download selected file(s)
+* **Ctrl-s:** stream selected file(s)
+* **Ctrl-t:** tag selected file(s)
+* **Ctrl-o:** download and open selected file(s)
+* **Ctrl-e:** download and export selected file(s)
 
-## Downloaded View
+## Downloads panel
 
-* Ctrl-o or Enter: open selected files
+* **Ctrl-o:** open selected file(s)
+* **Ctrl-t:** tag selected file(s)
