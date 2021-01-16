@@ -1,5 +1,7 @@
 # Towards the 1.0.0 public release
 
+Complete all the items in the [Swamp 1.0 milestone](https://github.com/swampapp/swamp/milestone/1).
+
 ## Current status
 
 The app is currently a proof of concept.
