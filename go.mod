@@ -2,7 +2,7 @@ module github.com/swampapp/swamp
 
 go 1.16
 
-replace github.com/gotk3/gotk3 => github.com/rubiojr/gotk3 v0.6.0
+replace github.com/gotk3/gotk3 => github.com/rubiojr/gotk3 v0.6.1-0.20210116142446-e7c4bc251504
 
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20200131002437-cf55d5288a48
