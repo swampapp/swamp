@@ -8,8 +8,10 @@ Lives under `$HOME/.config/com.githubapp.swamp`.
 
 Lives under `$HOME/.local/share/com.github.swampapp`.
 
+```
 ❯ ls ~/.local/share/com.github.swampapp/repositories/bef9c329b3c046c682d97bb4da793a3a2a31e2dc0ae43616a40cd93cef2a8563
 index  tags.db
+```
 
 ### The index
 
