@@ -63,6 +63,7 @@ func New() *FLView {
 	flv.AppendColumn(createColumn("Path", int(COLUMN_PATH), 40))
 	flv.AppendColumn(createBytesColumn("Size", int(COLUMN_SIZE), 40))
 	flv.AppendColumn(createColumn("ID", int(COLUMN_ID), 40))
+	flv.AppendColumn(createColumn("BHash", int(COLUMN_BHASH), 40))
 	flv.SetEnableSearch(false)
 
 	// Creating a list store. This is what holds the data that will be shown on our tree view.
