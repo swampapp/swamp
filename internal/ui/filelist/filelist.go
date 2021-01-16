@@ -32,10 +32,13 @@ type FileList struct {
 	treeView      *flview.FLView
 	searchEntry   *gtk.SearchEntry
 	lastExportDir string
+	uniqueCBT     *gtk.CheckButton
 }
 
 func New() *FileList {
 	f := &FileList{Component: component.New("/ui/filelist")}
+
+	f.uniqueCBT = f.GladeWidget("uniqueCBT").(*gtk.CheckButton)
 	f.Box = f.GladeWidget("filelist").(*gtk.Box)
 	f.searchEntry = f.GladeWidget("searchEntry").(*gtk.SearchEntry)
 	f.searchEntry.SetCanFocus(true)
@@ -51,6 +54,11 @@ func New() *FileList {
 
 	f.GladeWidget("searchBtn").(*gtk.Button).Connect("clicked", func() {
 		f.searchEntry.Emit("activate")
+	})
+
+	f.uniqueCBT.Connect("clicked", func() {
+		t, _ := f.searchEntry.GetText()
+		f.updateFileList(t)
 	})
 
 	return f
@@ -372,6 +380,7 @@ func (f *FileList) updateFileList(query string) {
 		return
 	}
 
+	idCache := map[string]struct{}{}
 	var fileID, filename, path, bhash string
 	size := 0.0
 	count := 0
@@ -402,6 +411,12 @@ func (f *FileList) updateFileList(query string) {
 		return true
 	},
 		func() bool {
+			_, found := idCache[bhash]
+			if f.uniqueCBT.GetActive() && found {
+				return true
+			}
+			idCache[bhash] = struct{}{}
+
 			if ok, _ := downloader.Instance().WasDownloaded(fileID); ok {
 				f.treeView.AddRow(resources.ImageForDoc("XXX"), filename, path, fmt.Sprintf("%.0f", size), fileID, bhash)
 			} else {
