@@ -13,7 +13,7 @@ import (
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/downloader"
 	"github.com/swampapp/swamp/internal/index"
-	"github.com/swampapp/swamp/internal/queries"
+	"github.com/swampapp/swamp/internal/queryparser"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/status"
 	"github.com/swampapp/swamp/internal/streamer"
@@ -384,7 +384,13 @@ func (f *FileList) updateFileList(query string) {
 	var fileID, filename, path, bhash string
 	size := 0.0
 	count := 0
-	_, err = idx.Search(queries.Parse(query), func(field string, value []byte) bool {
+	q, err := queryparser.ParseQuery(query)
+	log.Debug().Msgf("searching for %s", q)
+	if err != nil {
+		status.Set("⚠️ invalid query: " + err.Error())
+		return
+	}
+	_, err = idx.Search(q, func(field string, value []byte) bool {
 		if field == "filename" {
 			filename = string(value)
 		}

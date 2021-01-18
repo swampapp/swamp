@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <repo-id>\d", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s <repo-id>\f", os.Args[0])
 		os.Exit(1)
 	}
 	repo := os.Args[1]
