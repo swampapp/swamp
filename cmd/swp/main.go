@@ -13,7 +13,7 @@ import (
 	"github.com/rubiojr/rapi"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
-	"github.com/swampapp/swamp/internal/queries"
+	"github.com/swampapp/swamp/internal/queryparser"
 	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/urfave/cli/v2"
 )
@@ -214,11 +214,14 @@ func doSearch(c *cli.Context) error {
 	if q == "" {
 		return fmt.Errorf("missing query argument")
 	}
-	q = queries.Parse(q)
+	q, err := queryparser.ParseQuery(q)
+	if err != nil {
+		return err
+	}
 
 	verbose := c.Bool("verbose")
 
-	fmt.Println("Searching...\n")
+	fmt.Printf("Searching...\n\n")
 
 	filterField := func(name string) bool {
 		if verbose {
