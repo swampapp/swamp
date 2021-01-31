@@ -48,7 +48,7 @@ func New() *FLView {
 		glib.TYPE_STRING,
 		glib.TYPE_STRING,
 		glib.TYPE_STRING,
-		glib.TYPE_INT,
+		glib.TYPE_INT64,
 		glib.TYPE_STRING,
 	)
 	flv.SetModel(flv.listStore)
