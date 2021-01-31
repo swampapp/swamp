@@ -6,6 +6,7 @@ package indexer
 
 import (
 	"context"
+	"os"
 	"os/exec"
 	"sync"
 	"time"
@@ -79,9 +80,6 @@ func (i *Indexer) Start() {
 			log.Print("indexer: waiting for first boot")
 		}
 
-		rs.ExportEnv()
-		defer resticsettings.ResetEnv()
-
 		log.Debug().Msg("indexer: checking for new snapshots")
 		ok, err := index.NeedsIndexing(config.PreferredRepo())
 		if err != nil {
@@ -102,6 +100,11 @@ func (i *Indexer) Start() {
 			}
 			log.Printf("indexer: %s %s %s %s", bin, "--index-path", settings.IndexPath(), "index")
 			cmd := exec.CommandContext(ctx, bin, "--index-path", settings.IndexPath(), "index")
+			cmd.Env = os.Environ()
+			cmd.Env = append(cmd.Env, "RESTIC_REPOSITORY="+rs.Repository)
+			cmd.Env = append(cmd.Env, "RESTIC_PASSWORD="+rs.Password)
+			cmd.Env = append(cmd.Env, "AWS_ACCESS_KEY="+rs.Var1)
+			cmd.Env = append(cmd.Env, "AWS_SECRET_ACCESS_KEY="+rs.Var2)
 			out, err := cmd.CombinedOutput()
 			if err != nil {
 				log.Error().Err(err).Msgf("indexer: swampd error: %s", out)
