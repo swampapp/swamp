@@ -141,6 +141,9 @@ func isAllowed(ch rune) bool {
 		ch == '_' ||
 		ch == '"' ||
 		ch == '+' ||
+		ch == '>' ||
+		ch == '=' ||
+		ch == '<' ||
 		ch == '~'
 }
 

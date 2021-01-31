@@ -32,7 +32,9 @@ func TestScanner_Scan(t *testing.T) {
 		{s: `type:audio`, tok: parser.TYPE, lit: "type:audio"},
 		{s: `size:128MB`, tok: parser.SIZE, lit: "size:128MB"},
 		{s: `size:128`, tok: parser.SIZE, lit: "size:128"},
+		{s: `size:>=128`, tok: parser.SIZE, lit: "size:>=128"},
 		{s: `+size:128`, tok: parser.SIZE, lit: "+size:128"},
+		{s: `+size:>128`, tok: parser.SIZE, lit: "+size:>128"},
 	}
 
 	for i, tt := range tests {

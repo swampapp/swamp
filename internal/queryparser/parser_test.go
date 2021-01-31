@@ -76,6 +76,11 @@ func TestParser_ParseStatement(t *testing.T) {
 		},
 
 		{
+			q: `size:>=5gb`,
+			e: `size:>=5368709120`,
+		},
+
+		{
 			q: `size:1mb foo`,
 			e: `size:1048576 +foo`,
 		},
@@ -111,8 +116,8 @@ func TestParser_ParseStatement(t *testing.T) {
 			e: fmt.Sprintf(`+updated:>="%s" +updated:<="%s"`, ybod, yeod),
 		},
 
-		{q: `size:bMB`, err: `invalid size specified`},
-		{q: `size:cc`, err: `invalid size specified`},
+		{q: `size:bMB`, err: `invalid size 'size:bMB' specified`},
+		{q: `size:cc`, err: `invalid size 'size:cc' specified`},
 	}
 
 	for i, tt := range tests {

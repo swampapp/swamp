@@ -147,7 +147,7 @@ func (p *Parser) parseModified(lit string) string {
 
 func (p *Parser) parseSize(lit string) (string, error) {
 	if !sizeRegexp.Match([]byte(lit)) {
-		return "", fmt.Errorf("invalid size specified")
+		return "", fmt.Errorf("invalid size '%s' specified", lit)
 	}
 	res := sizeRegexp.FindAllStringSubmatch(lit, -1)
 	hsize := fmt.Sprintf("%s%s", res[0][3], res[0][4])
