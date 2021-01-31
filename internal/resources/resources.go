@@ -17,12 +17,19 @@ import (
 
 var imageCloud, imageCompressed, imageOther, imageImage, imageAudio, imageVideo, imageDoc *gdk.Pixbuf
 
+//go:embed res.gresource
+var resfs embed.FS
+
+//go:embed swamp.desktop
+var dotDesktop embed.FS
+
+//go:embed swampapp.png
+var iconfs embed.FS
+
 // load basic resources o they are ready for the app
 func InitResources() {
 	os.MkdirAll(settings.DataDir(), 0755)
 
-	//go:embed res.gresource
-	var resfs embed.FS
 	f, err := resfs.Open("res.gresource")
 	if err != nil {
 		panic(err)
@@ -55,8 +62,6 @@ func copyDesktop() {
 	}
 	defer out.Close()
 
-	//go:embed swamp.desktop
-	var dotDesktop embed.FS
 	f, err := dotDesktop.Open("swamp.desktop")
 	if err != nil {
 		panic(err)
@@ -80,8 +85,6 @@ func copyIcon() {
 	}
 	defer out.Close()
 
-	//go:embed swampapp.png
-	var iconfs embed.FS
 	f, err := iconfs.Open("swampapp.png")
 	if err != nil {
 		panic(err)
