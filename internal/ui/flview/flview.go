@@ -212,7 +212,7 @@ func createBytesColumn(title string, id int, width int) *gtk.TreeViewColumn {
 
 	column, _ := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", id)
 	column.SetResizable(true)
-	column.SetSortColumnID(5)
+	column.SetSortColumnID(int(COLUMN_USIZE))
 	column.SetSortOrder(gtk.SORT_DESCENDING)
 
 	return column
