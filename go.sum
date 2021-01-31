@@ -79,6 +79,8 @@ github.com/blevesearch/snowballstem v0.9.0 h1:lMQ189YspGP6sXvZQ4WZ+MLawfV8wOmPoD
 github.com/blevesearch/snowballstem v0.9.0/go.mod h1:PivSj3JMc8WuaFkTSRDW2SlrulNWPl4ABg1tC/hlgLs=
 github.com/blugelabs/bluge v0.1.4-0.20201021190638-c304a6733af6 h1:tndTLZtPsTjwKvKr5J6S6zIcjzhMAv8PsHfRmNbMuW4=
 github.com/blugelabs/bluge v0.1.4-0.20201021190638-c304a6733af6/go.mod h1:Ah8c1+vYuQiL26j2SXwyt2OPQhcE75q9LTtUVQx0hYA=
+github.com/blugelabs/bluge v0.1.5-0.20201230014014-ee2b8ea003e8 h1:b+WpGWgboHf0Z+2r7YKmjl5hRSk1Bsg2kxe2cpFFUp4=
+github.com/blugelabs/bluge v0.1.5-0.20201230014014-ee2b8ea003e8/go.mod h1:Ah8c1+vYuQiL26j2SXwyt2OPQhcE75q9LTtUVQx0hYA=
 github.com/blugelabs/bluge_segment_api v0.1.0 h1:Z+rj+KYLpdblTAYSjBsuNC79dHB3Oc5exuDBEyAGPnk=
 github.com/blugelabs/bluge_segment_api v0.1.0/go.mod h1:tV1dxZRn5KUxlghf8qWwDs05TdcxaiW+TkXecb7nt54=
 github.com/blugelabs/ice v0.1.1 h1:H4EpKdiFSKKLMo0CLl4keCdHFEQIF+sMMUEds7SQBQs=
@@ -330,6 +332,12 @@ github.com/rubiojr/rapi v0.0.0-20201230200601-5ed59be0451f h1:VanA3c939PVRauBr3d
 github.com/rubiojr/rapi v0.0.0-20201230200601-5ed59be0451f/go.mod h1:Ft+bi8loIdZ4C9AcPVFPlNXh9rVkBMLWgQGQhNL+CaE=
 github.com/rubiojr/rindex v0.0.0-20210107154643-bee681911741 h1:PAnrv+aKSRv7KntHmwNNo751oujWeRa64/x9e5GUwuA=
 github.com/rubiojr/rindex v0.0.0-20210107154643-bee681911741/go.mod h1:tEevXY1gMjG+se+9v4Ke7i0oNVxzw2b5yMeojzIsPbQ=
+github.com/rubiojr/rindex v0.0.0-20210131155915-91bfcaa26b85 h1:Qn3kVbZLJJTZJSqEA4tN6BzMzc9QwFLJwH+APM9/nvY=
+github.com/rubiojr/rindex v0.0.0-20210131155915-91bfcaa26b85/go.mod h1:5xzXOd8ez7+2TkvRNqNxsRCo2ro5o+8GbNAkIfzbUGI=
+github.com/rubiojr/rindex v0.0.0-20210131163311-40e39ab9b6d3 h1:YV+rQn03ZG984j8XcvjLYy9B0oJnPxZcJaN6Hb3LkUw=
+github.com/rubiojr/rindex v0.0.0-20210131163311-40e39ab9b6d3/go.mod h1:5xzXOd8ez7+2TkvRNqNxsRCo2ro5o+8GbNAkIfzbUGI=
+github.com/rubiojr/rindex v0.0.0-20210131170506-4294f994bfcc h1:q14hUOgdD2Nyc5j1jlufmdZEnBB1Q9ipypPHN5ZVhDU=
+github.com/rubiojr/rindex v0.0.0-20210131170506-4294f994bfcc/go.mod h1:5xzXOd8ez7+2TkvRNqNxsRCo2ro5o+8GbNAkIfzbUGI=
 github.com/russross/blackfriday v1.5.2 h1:HyvC0ARfnZBqnXwABFeSZHpKvJHJJfPz81GNueLj0oo=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday/v2 v2.0.1 h1:lPqVAte+HuHNfhJ/0LC98ESWRz8afy9tM/0RK8m9o+Q=
