@@ -20,81 +20,44 @@ var imageCloud, imageCompressed, imageOther, imageImage, imageAudio, imageVideo,
 //go:embed res.gresource
 var resfs embed.FS
 
-//go:embed swamp.desktop
-var dotDesktop embed.FS
-
-//go:embed swampapp.png
-var iconfs embed.FS
-
 // load basic resources o they are ready for the app
 func InitResources() {
-	os.MkdirAll(settings.DataDir(), 0755)
+	if err := os.MkdirAll(settings.DataDir(), 0755); err != nil {
+		log.Error().Err(err)
+	}
 
 	f, err := resfs.Open("res.gresource")
 	if err != nil {
 		panic(err)
 	}
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			log.Error().Err(err)
+		}
+	}()
 
 	rpath := filepath.Join(settings.DataDir(), "res.gresource")
 	out, err := os.Create(rpath)
-	defer out.Close()
+	if err != nil {
+		panic(fmt.Errorf("error creating res.gresource: %v", err))
+	}
+	defer func() {
+		if err = out.Close(); err != nil {
+			log.Error().Err(err)
+		}
+	}()
+
 	_, err = io.Copy(out, f)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("error copying res.gresource: %v", err))
 	}
-	out.Close()
 
 	res, err := gio.LoadGResource(rpath)
+	if err != nil {
+		log.Error().Err(err)
+	}
+
 	gio.RegisterGResource(res)
-
-	//copyIcon()
-	//copyDesktop()
-}
-
-func copyDesktop() {
-	rpath := filepath.Join(settings.AppsDir(), "com.github.swampapp.desktop")
-	os.MkdirAll(settings.BinDir(), 0755)
-	out, err := os.Create(rpath)
-	if err != nil {
-		log.Error().Err(err).Msg("error creating .desktop file")
-		return
-	}
-	defer out.Close()
-
-	f, err := dotDesktop.Open("swamp.desktop")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-
-	_, err = io.Copy(out, f)
-	if err != nil {
-		log.Error().Err(err).Msg("could not copy desktop file")
-		return
-	}
-}
-
-func copyIcon() {
-	rpath := filepath.Join(settings.IconsDir(), "swampapp.png")
-	os.MkdirAll(settings.BinDir(), 0755)
-	out, err := os.Create(rpath)
-	if err != nil {
-		log.Error().Err(err).Msg("error creating icon")
-		return
-	}
-	defer out.Close()
-
-	f, err := iconfs.Open("swampapp.png")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-
-	_, err = io.Copy(out, f)
-	if err != nil {
-		log.Error().Err(err).Msg("could not copy swampd icon")
-	}
 }
 
 func LoadImages() {
