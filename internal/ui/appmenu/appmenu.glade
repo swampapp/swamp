@@ -10,7 +10,6 @@
       <object class="GtkScrolledWindow" id="appMenuSW">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="shadow_type">in</property>
         <property name="min_content_width">180</property>
         <child>
           <placeholder/>

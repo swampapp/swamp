@@ -10,7 +10,6 @@
       <object class="GtkPaned" id="content_panel">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="border_width">8</property>
         <child>
           <placeholder/>
         </child>

@@ -84,7 +84,6 @@
       <object class="GtkScrolledWindow" id="filelistSW">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="shadow_type">in</property>
         <child>
           <placeholder/>
         </child>
