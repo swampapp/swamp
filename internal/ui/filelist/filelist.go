@@ -26,13 +26,17 @@ import (
 
 const maxResults = 500
 
+var tagRegexp = regexp.MustCompile(`^tag:(?P<tag>[^\s]+)`)
+
 type FileList struct {
 	*component.Component
 	*gtk.Box
-	treeView      *flview.FLView
-	searchEntry   *gtk.SearchEntry
-	lastExportDir string
-	uniqueCBT     *gtk.CheckButton
+	treeView         *flview.FLView
+	searchEntry      *gtk.SearchEntry
+	lastExportDir    string
+	uniqueCBT        *gtk.CheckButton
+	notDownloadedImg *gdk.Pixbuf
+	downloadedImg    *gdk.Pixbuf
 }
 
 func New() *FileList {
@@ -352,18 +356,19 @@ func (f *FileList) setup() {
 }
 
 func (f *FileList) updateFileList(query string) {
+	f.notDownloadedImg = resources.ImageForDoc("XXX")
+	f.downloadedImg = resources.ImageForDoc("some.cloud")
 	f.treeView.Clear()
-	idx, err := index.Client()
-	if err != nil {
-		log.Err(err).Msg("error updating file list")
-		return
+	if !f.searchTags(query) {
+		f.searchIndex(query)
 	}
+}
 
-	re := regexp.MustCompile(`^tag:(?P<tag>[^\s]+)`)
-	if re.Match([]byte(query)) {
+func (f *FileList) searchTags(query string) bool {
+	if tagRegexp.Match([]byte(query)) {
 		tname := ""
-		match := re.FindStringSubmatch(query)
-		for i := range re.SubexpNames() {
+		match := tagRegexp.FindStringSubmatch(query)
+		for i := range tagRegexp.SubexpNames() {
 			if i > 0 && i <= len(match) {
 				tname = match[i]
 			}
@@ -372,14 +377,25 @@ func (f *FileList) updateFileList(query string) {
 		docs, _ := tags.GetDocuments(tname)
 		for _, doc := range docs {
 			if ok, _ := downloader.Instance().WasDownloaded(doc.ID); ok {
-				f.treeView.AddRow(resources.ImageForDoc("XXX"), doc.Name, doc.Path, doc.Size, doc.ID, doc.BHash)
+				f.treeView.AddRow(f.downloadedImg, doc.Name, doc.Path, doc.Size, doc.ID, doc.BHash)
 			} else {
-				f.treeView.AddRow(resources.ImageForDoc("some.cloud"), doc.Name, doc.Path, doc.Size, doc.ID, doc.BHash)
+				f.treeView.AddRow(f.notDownloadedImg, doc.Name, doc.Path, doc.Size, doc.ID, doc.BHash)
 			}
 		}
+		return true
+	}
+
+	return false
+}
+
+func (f *FileList) searchIndex(query string) {
+	idx, err := index.Client()
+	if err != nil {
+		log.Err(err).Msg("error updating file list")
 		return
 	}
 
+	filterDupes := f.uniqueCBT.GetActive()
 	idCache := map[string]struct{}{}
 	var fileID, filename, path, bhash string
 	size := 0.0
@@ -390,27 +406,21 @@ func (f *FileList) updateFileList(query string) {
 		status.Set("⚠️ invalid query: " + err.Error())
 		return
 	}
+
 	_, err = idx.Search(q, func(field string, value []byte) bool {
-		if field == "filename" {
+		switch field {
+		case "filename":
 			filename = string(value)
-		}
-
-		if field == "path" {
+		case "path":
 			path = string(value)
-		}
-
-		if field == "size" {
+		case "size":
 			size, err = bluge.DecodeNumericFloat64(value)
 			if err != nil {
 				size = -1
 			}
-		}
-
-		if field == "_id" {
+		case "_id":
 			fileID = string(value)
-		}
-
-		if field == "bhash" {
+		case "bhash":
 			bhash = string(value)
 		}
 
@@ -418,15 +428,15 @@ func (f *FileList) updateFileList(query string) {
 	},
 		func() bool {
 			_, found := idCache[bhash]
-			if f.uniqueCBT.GetActive() && found {
+			if filterDupes && found {
 				return true
 			}
 			idCache[bhash] = struct{}{}
-
+			// FIXME: this is quite expensive with a large number of results
 			if ok, _ := downloader.Instance().WasDownloaded(fileID); ok {
-				f.treeView.AddRow(resources.ImageForDoc("XXX"), filename, path, fmt.Sprintf("%.0f", size), fileID, bhash)
+				f.treeView.AddRow(f.downloadedImg, filename, path, fmt.Sprintf("%.0f", size), fileID, bhash)
 			} else {
-				f.treeView.AddRow(resources.ImageForDoc("some.cloud"), filename, path, fmt.Sprintf("%.0f", size), fileID, bhash)
+				f.treeView.AddRow(f.notDownloadedImg, filename, path, fmt.Sprintf("%.0f", size), fileID, bhash)
 			}
 			count++
 			return count <= maxResults
