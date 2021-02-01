@@ -36,12 +36,9 @@ func init() {
 func daemonize() {
 	go func() {
 		ticker := time.NewTicker(30 * time.Minute)
-		for {
-			select {
-			case <-ticker.C:
-				log.Print("indexer: trying to start swampd")
-				Daemon().Start()
-			}
+		for range ticker.C {
+			log.Print("indexer: trying to start swampd")
+			Daemon().Start()
 		}
 	}()
 }

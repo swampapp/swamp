@@ -212,6 +212,3 @@ func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
 	}
 	return
 }
-
-// unscan pushes the previously read token back onto the buffer.
-func (p *Parser) unscan() { p.buf.n = 1 }

@@ -39,7 +39,9 @@ func AddRepository(name, id string, preferred bool) {
 		SetPreferredRepo(id)
 	}
 
-	os.MkdirAll(filepath.Join(RepositoriesDir(), id), 0755)
+	if err := os.MkdirAll(filepath.Join(RepositoriesDir(), id), 0755); err != nil {
+		log.Error().Err(err)
+	}
 }
 
 func RepositoriesDir() string {
@@ -47,7 +49,10 @@ func RepositoriesDir() string {
 }
 
 func init() {
-	os.MkdirAll(Dir(), 0755)
+	if err := os.MkdirAll(Dir(), 0755); err != nil {
+		log.Error().Err(err)
+	}
+
 	if _, err := os.Stat(Path()); err == nil {
 		Load()
 	}
@@ -100,7 +105,9 @@ func Load() {
 	}
 
 	for _, repo := range instance.Repositories {
-		os.MkdirAll(filepath.Join(RepositoriesDir(), repo.ID), 0755)
+		if err := os.MkdirAll(filepath.Join(RepositoriesDir(), repo.ID), 0755); err != nil {
+			log.Error().Err(err)
+		}
 	}
 }
 

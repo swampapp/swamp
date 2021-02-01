@@ -67,7 +67,7 @@ func TestParser_ParseStatement(t *testing.T) {
 
 		{
 			q: `type:ebook`,
-			e: fmt.Sprintf("%s", queryparser.TYPE_EBOOK),
+			e: queryparser.TYPE_EBOOK,
 		},
 
 		{

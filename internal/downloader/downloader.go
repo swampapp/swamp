@@ -69,7 +69,9 @@ type downloadRequest struct {
 var dcache *leveldb.DB
 
 func init() {
-	os.MkdirAll(settings.DownloadsDir(), 0755)
+	if err := os.MkdirAll(settings.DownloadsDir(), 0755); err != nil {
+		log.Error().Err(err)
+	}
 }
 
 func Instance() *Downloader {
@@ -82,15 +84,23 @@ func Instance() *Downloader {
 		pool := tunny.NewFunc(maxWorkers, func(i interface{}) interface{} {
 			req := i.(downloadRequest)
 			err := instance.downloadFileID(req.fileID)
+			if err != nil {
+				log.Error().Err(err)
+				return err
+			}
+
 			if req.exportDir != "" && req.name != "" {
 				err := Export(req.fileID, req.name, req.exportDir)
 				if err != nil {
 					log.Error().Err(err).Msgf("error exporting file '%s'", req.name)
+					return err
 				}
 			}
 
 			if req.open {
-				Open(req.fileID)
+				if err := Open(req.fileID); err != nil {
+					log.Error().Err(err)
+				}
 			}
 
 			return err
@@ -223,7 +233,11 @@ func (d *Downloader) downloadFileID(fileID string) error {
 		log.Error().Err(err).Msg("error creating download tmp file")
 		return err
 	}
-	defer dest.Close()
+	defer func() {
+		if err := dest.Close(); err != nil {
+			log.Error().Err(err)
+		}
+	}()
 
 	log.Print("downloading ", fileID)
 	err = idx.Fetch(context.Background(), fileID, dest)
@@ -232,14 +246,13 @@ func (d *Downloader) downloadFileID(fileID string) error {
 		log.Error().Err(err).Msg("error downloading file")
 		return err
 	}
-	os.Rename(dest.Name(), dpath)
 
-	// doc downloaded successfully, add it to the cache
-	doc, err = index.GetDocument(fileID)
-	if err != nil {
+	if err := os.Rename(dest.Name(), dpath); err != nil {
+		log.Error().Err(err).Msgf("error moving file %s to %s", dest.Name(), dpath)
 		return err
 	}
 
+	// doc downloaded successfully, add it to the cache
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	err = enc.Encode(ddoc)
@@ -343,14 +356,22 @@ func Export(fid, name, target string) error {
 	if err != nil {
 		return err
 	}
-	defer in.Close()
+	defer func() {
+		if err := in.Close(); err != nil {
+			log.Error().Err(err)
+		}
+	}()
 
 	sn := safeExportName(filepath.Join(target, name))
 	out, err := os.Create(sn)
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer func() {
+		if err := out.Close(); err != nil {
+			log.Error().Err(err)
+		}
+	}()
 
 	if _, err = io.Copy(out, in); err != nil {
 		return err

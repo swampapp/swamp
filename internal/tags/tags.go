@@ -3,6 +3,7 @@ package tags
 import (
 	"path/filepath"
 
+	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/index"
 	"github.com/swampapp/swamp/internal/settings"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -23,7 +24,11 @@ func For(fileID string) ([]Tag, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Error().Err(err)
+		}
+	}()
 
 	tagsblob, err := db.Get([]byte(fileID), nil)
 	if err != nil {
@@ -46,7 +51,11 @@ func All() ([]Tag, error) {
 	if err != nil {
 		return tags, err
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Error().Err(err)
+		}
+	}()
 
 	iter := db.NewIterator(nil, nil)
 	for iter.Next() {
@@ -74,7 +83,11 @@ func GetDocuments(tag string) ([]index.Document, error) {
 	if err != nil {
 		return documents, err
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Error().Err(err)
+		}
+	}()
 
 	iter := db.NewIterator(nil, nil)
 	for iter.Next() {
@@ -112,7 +125,11 @@ func Save(fileID string, tags []Tag) error {
 	if err != nil {
 		return err
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Error().Err(err)
+		}
+	}()
 
 	mtags, err := msgpack.Marshal(tags)
 	if err != nil {

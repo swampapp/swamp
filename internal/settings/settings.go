@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/config"
 )
 
@@ -19,7 +20,9 @@ func SetDarkMode(mode bool) {
 }
 
 func init() {
-	os.MkdirAll(config.RepositoriesDir(), 0755)
+	if err := os.MkdirAll(config.RepositoriesDir(), 0755); err != nil {
+		log.Error().Err(err)
+	}
 }
 
 func Repository() string {

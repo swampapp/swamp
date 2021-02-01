@@ -37,13 +37,11 @@ func Stream(fileID string) error {
 			if onStartStreaming != nil {
 				onStartStreaming()
 			}
-			//status.StartDownloading()
 		})
 		defer glib.IdleAdd(func() {
 			if onStopStreaming != nil {
 				onStopStreaming()
 			}
-			//status.StopDownloading()
 		})
 		err = idx.Fetch(ctx, fileID, stdin)
 		if err != nil && err != context.Canceled {
