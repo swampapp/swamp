@@ -176,14 +176,24 @@ func indexRepo(cli *cli.Context) error {
 		log.Print("indexing stopped")
 	}
 
-	fmt.Printf(
-		"\n💥 %d indexed, %d already present. %d new snapshots. Took %d seconds.\n",
-		stats.IndexedFiles,
-		stats.AlreadyIndexed,
-		stats.ScannedSnapshots,
-		int(time.Since(tStart).Seconds()),
-	)
+	if cli.Bool("monitor") {
+		fmt.Printf(
+			"\n💥 %d indexed, %d already present. %d new snapshots. Took %d seconds.\n",
+			stats.IndexedFiles,
+			stats.AlreadyIndexed,
+			stats.ScannedSnapshots,
+			int(time.Since(tStart).Seconds()),
+		)
+	} else {
+		log.Info().Msgf(
+			"%d indexed, %d already present. %d new snapshots. Took %d seconds.\n",
+			stats.IndexedFiles,
+			stats.AlreadyIndexed,
+			stats.ScannedSnapshots,
+			int(time.Since(tStart).Seconds()),
+		)
 
+	}
 	return os.Remove(socketPath)
 }
 
