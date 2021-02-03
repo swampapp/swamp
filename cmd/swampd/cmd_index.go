@@ -94,7 +94,7 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 	}
 
 	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, os.Interrupt, os.Kill, syscall.SIGTERM)
+	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 	go func(c chan os.Signal) {
 		sig := <-c
 		log.Printf("shutting down socket server: %v", sig)
@@ -105,9 +105,7 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 	e.Listener = unixListener
 
 	log.Print("unix socket server starting")
-	e.Start("")
-
-	return nil
+	return e.Start("")
 }
 
 func indexRepo(cli *cli.Context) error {
@@ -124,10 +122,13 @@ func indexRepo(cli *cli.Context) error {
 		os.Remove(indexer.SocketPath())
 	}
 
-	statsviz.RegisterDefault()
-	go func() {
-		log.Print(http.ListenAndServe("localhost:6060", nil))
-	}()
+	if err := statsviz.RegisterDefault(); err == nil {
+		go func() {
+			log.Print(http.ListenAndServe("localhost:6060", nil))
+		}()
+	} else {
+		log.Error().Err(err).Msg("error running statsviz")
+	}
 
 	progress := make(chan rindex.IndexStats, 10)
 	idx, err := rindex.New(indexPath, globalOptions.Repo, globalOptions.Password)
@@ -141,7 +142,11 @@ func indexRepo(cli *cli.Context) error {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	go socketServer(cancel, progress)
+	go func() {
+		if err := socketServer(cancel, progress); err != nil {
+			log.Error().Err(err).Msg("socket server returned an error")
+		}
+	}()
 
 	if cli.Bool("monitor") {
 		go progressMonitor(cli.Bool("log-errors"), progress)
@@ -178,6 +183,7 @@ func indexRepo(cli *cli.Context) error {
 
 func progressMonitor(logErrors bool, progress chan rindex.IndexStats) {
 	s := spinner.New(spinner.CharSets[11], 200*time.Millisecond)
+	//nolint
 	s.Color("fgGreen")
 	fmt.Println()
 	s.Suffix = " Analyzing the repository..."
