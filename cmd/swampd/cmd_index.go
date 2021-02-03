@@ -89,6 +89,7 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 	})
 
 	e.POST("/kill", func(c echo.Context) error {
+		log.Debug().Msg("swampd was told to quit")
 		cancel()
 		return c.JSON(http.StatusOK, "shutting down")
 	})
