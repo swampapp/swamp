@@ -1,6 +1,7 @@
 package indexer
 
 import (
+	"encoding/json"
 	"io"
 	"net"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/swampapp/swamp/internal/settings"
@@ -44,7 +46,7 @@ func Daemon() *Indexer {
 
 func (i *Indexer) Start() {
 	go func() {
-		if i.IsRunning() {
+		if IsRunning() {
 			log.Print("indexer: already running, skiping")
 			return
 		}
@@ -93,7 +95,7 @@ func (i *Indexer) Start() {
 }
 
 func (i *Indexer) Stop() error {
-	resp, err := sClient().Post("http://localhost/kill", "text/plain", nil)
+	resp, err := Client().Post("http://localhost/kill", "text/plain", nil)
 	if err != nil {
 		return err
 	}
@@ -103,15 +105,15 @@ func (i *Indexer) Stop() error {
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		log.Error().Err(err).Msg("unhandled error reading body")
-		if !i.IsRunning() {
+		if !IsRunning() {
 			notifyStop()
 		}
 	}
 	return err
 }
 
-func (i *Indexer) IsRunning() bool {
-	resp, err := sClient().Get("http://localhost/ping")
+func IsRunning() bool {
+	resp, err := Client().Get("http://localhost/ping")
 	if err != nil {
 		return false
 	}
@@ -156,7 +158,7 @@ func notifyStop() {
 	}
 }
 
-func sClient() *http.Client {
+func Client() *http.Client {
 	clientOnce.Do(func() {
 		unixDial := func(proto, addr string) (conn net.Conn, err error) {
 			return net.Dial("unix", socketPath)
@@ -169,4 +171,26 @@ func sClient() *http.Client {
 	})
 
 	return socketClient
+}
+
+func SocketPath() string {
+	return socketPath
+}
+
+func Stats() (rindex.IndexStats, error) {
+	resp, err := Client().Get("http://localhost/stats")
+	if err != nil {
+		log.Print("error fetching stats")
+	}
+	defer resp.Body.Close()
+
+	var p rindex.IndexStats
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return p, err
+	}
+
+	err = json.Unmarshal(b, &p)
+
+	return p, err
 }

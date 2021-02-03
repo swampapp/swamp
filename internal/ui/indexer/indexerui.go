@@ -33,7 +33,7 @@ func New() *Indexer {
 	})
 
 	i.indexAnimation, _ = i.GladeWidget("indexingFlask").(*gtk.Image)
-	if indexer.Daemon().IsRunning() {
+	if indexer.IsRunning() {
 		i.indexButton.SetLabel("Stop Indexing")
 		resources.UpdateImageFromResource(i.indexAnimation, "indexing")
 	} else {

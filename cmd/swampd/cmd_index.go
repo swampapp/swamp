@@ -2,15 +2,12 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net"
 	"os"
 	"os/signal"
-	"path/filepath"
-	"sync"
 	"syscall"
 	"time"
 
@@ -23,17 +20,13 @@ import (
 	"github.com/muesli/reflow/padding"
 	"github.com/muesli/reflow/truncate"
 	"github.com/rubiojr/rindex"
-	"github.com/swampapp/swamp/internal/settings"
+	"github.com/swampapp/swamp/internal/indexer"
 	"github.com/urfave/cli/v2"
 )
 
 var tStart = time.Now()
 
 const statusStrLen = 40
-
-var socketPath = filepath.Join(settings.DataDir(), "indexing.sock")
-var socketClient *http.Client
-var once sync.Once
 
 // higher than this could cause trouble with mem usage and file descriptors
 const batchSize = 300
@@ -94,8 +87,8 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 		return c.JSON(http.StatusOK, "shutting down")
 	})
 
-	log.Debug().Msgf("swampd socket path: %s", socketPath)
-	unixListener, err := net.Listen("unix", socketPath)
+	log.Debug().Msgf("swampd socket path: %s", indexer.SocketPath())
+	unixListener, err := net.Listen("unix", indexer.SocketPath())
 	if err != nil {
 		panic(err)
 	}
@@ -117,33 +110,18 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 	return nil
 }
 
-func sClient() *http.Client {
-	once.Do(func() {
-		unixDial := func(proto, addr string) (conn net.Conn, err error) {
-			return net.Dial("unix", socketPath)
-		}
-		tr := &http.Transport{
-			Dial: unixDial,
-		}
-		socketClient = &http.Client{Transport: tr}
-
-	})
-
-	return socketClient
-}
-
 func indexRepo(cli *cli.Context) error {
-	_, err := os.Stat(socketPath)
+	_, err := os.Stat(indexer.SocketPath())
 	if err != nil {
 		if !os.IsNotExist(err) {
 			panic(err)
 		}
 	} else {
-		if isIndexing() {
+		if indexer.IsRunning() {
 			return errors.New("swampd is already running")
 		}
-		log.Warn().Msgf("socket file found in %s, but looks stale, removing", socketPath)
-		os.Remove(socketPath)
+		log.Warn().Msgf("socket file found in %s, but looks stale, removing", indexer.SocketPath())
+		os.Remove(indexer.SocketPath())
 	}
 
 	statsviz.RegisterDefault()
@@ -195,7 +173,7 @@ func indexRepo(cli *cli.Context) error {
 		)
 
 	}
-	return os.Remove(socketPath)
+	return os.Remove(indexer.SocketPath())
 }
 
 func progressMonitor(logErrors bool, progress chan rindex.IndexStats) {
@@ -205,7 +183,7 @@ func progressMonitor(logErrors bool, progress chan rindex.IndexStats) {
 	s.Suffix = " Analyzing the repository..."
 
 	for {
-		p, err := getStats()
+		p, err := indexer.Stats()
 		if err != nil {
 			log.Error().Err(err).Msgf("error reading stats")
 			continue
@@ -256,33 +234,4 @@ func printStats(logErrors bool, p rindex.IndexStats, s *spinner.Spinner) {
 		p.ScannedSnapshots,
 		p.MissingSnapshots,
 	)
-}
-
-func isIndexing() bool {
-	resp, err := sClient().Get("http://localhost/ping")
-	if err != nil {
-		return false
-	}
-	defer resp.Body.Close()
-
-	b, err := io.ReadAll(resp.Body)
-	return string(b) == "pong"
-}
-
-func getStats() (rindex.IndexStats, error) {
-	resp, err := sClient().Get("http://localhost/stats")
-	if err != nil {
-		log.Print("error fetching stats")
-	}
-	defer resp.Body.Close()
-
-	var p rindex.IndexStats
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return p, err
-	}
-
-	err = json.Unmarshal(b, &p)
-
-	return p, err
 }
