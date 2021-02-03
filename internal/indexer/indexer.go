@@ -1,39 +1,30 @@
 package indexer
 
-// FIXME:
-// * Needs to handle graceful shutdowns (i.e. when exiting the app)
-// * Use Cancel context to be able to shutdown the indexer gracefully
-
 import (
-	"context"
+	"io"
+	"net"
+	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/config"
-	"github.com/swampapp/swamp/internal/index"
 	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/swampapp/swamp/internal/settings"
-	"golang.org/x/sync/semaphore"
 )
-
-var sem = semaphore.NewWeighted(1)
 
 type Indexer struct {
 }
 
-var once sync.Once
+var clientOnce, once sync.Once
 var instance *Indexer
-var cancel context.CancelFunc
-var ctx context.Context
+var socketClient *http.Client
+var socketPath = filepath.Join(settings.DataDir(), "indexing.sock")
 
 func init() {
-	daemonize()
-}
-
-func daemonize() {
 	go func() {
 		ticker := time.NewTicker(30 * time.Minute)
 		for range ticker.C {
@@ -53,34 +44,24 @@ func Daemon() *Indexer {
 
 func (i *Indexer) Start() {
 	go func() {
-		if !sem.TryAcquire(1) {
+		if i.IsRunning() {
 			log.Print("indexer: already running, skiping")
 			return
 		}
-		defer sem.Release(1)
-		ctx, cancel = context.WithCancel(context.Background())
-
-		prepo := config.PreferredRepo()
-		log.Printf("indexer: STARTING the indexing goroutine, repo %s", prepo)
-		rs := resticsettings.New(prepo)
 
 		log.Print("indexer: STARTED the indexing goroutine")
+		prepo := config.PreferredRepo()
+		rs := resticsettings.New(prepo)
+
 		notifyStart()
 
 		for {
-			time.Sleep(10 * time.Second)
-			// FIXME
 			if !resticsettings.FirstBoot() {
 				log.Print("indexer: no first boot")
 				break
 			}
+			time.Sleep(10 * time.Second)
 			log.Print("indexer: waiting for first boot")
-		}
-
-		log.Debug().Msg("indexer: checking for new snapshots")
-		ok, err := index.NeedsIndexing(config.PreferredRepo())
-		if err != nil {
-			log.Error().Err(err).Msg("indexer: error accessing the repository")
 		}
 
 		defer func() {
@@ -88,45 +69,52 @@ func (i *Indexer) Start() {
 			log.Print("indexer: stopped swampd")
 		}()
 
-		if ok {
-			log.Print("indexer: starting swampd")
-			bin, err := exec.LookPath("swampd")
-			if err != nil {
-				log.Error().Err(err).Msg("error finding swampd executable path")
-				return
-			}
-			log.Printf("indexer: %s %s %s %s", bin, "--index-path", settings.IndexPath(), "index")
-			cmd := exec.CommandContext(ctx, bin, "--index-path", settings.IndexPath(), "index")
-			cmd.Env = os.Environ()
-			cmd.Env = append(cmd.Env, "RESTIC_REPOSITORY="+rs.Repository)
-			cmd.Env = append(cmd.Env, "RESTIC_PASSWORD="+rs.Password)
-			cmd.Env = append(cmd.Env, "AWS_ACCESS_KEY="+rs.Var1)
-			cmd.Env = append(cmd.Env, "AWS_SECRET_ACCESS_KEY="+rs.Var2)
-			out, err := cmd.CombinedOutput()
-			if err != nil {
-				log.Error().Err(err).Msgf("indexer: swampd error: %s", out)
-			}
-		} else {
-			log.Debug().Msg("indexer: does not need indexing")
+		log.Print("indexer: starting swampd")
+		bin, err := exec.LookPath("swampd")
+		if err != nil {
+			log.Error().Err(err).Msg("error finding swampd executable path")
+			return
+		}
+
+		log.Printf("indexer: %s %s %s %s", bin, "--index-path", settings.IndexPath(), "index")
+		cmd := exec.Command(bin, "--debug", "--index-path", settings.IndexPath(), "index")
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Env = os.Environ()
+		cmd.Env = append(cmd.Env, "RESTIC_REPOSITORY="+rs.Repository)
+		cmd.Env = append(cmd.Env, "RESTIC_PASSWORD="+rs.Password)
+		cmd.Env = append(cmd.Env, "AWS_ACCESS_KEY="+rs.Var1)
+		cmd.Env = append(cmd.Env, "AWS_SECRET_ACCESS_KEY="+rs.Var2)
+		err = cmd.Run()
+		if err != nil {
+			log.Error().Err(err).Msgf("indexer: swampd error")
 		}
 	}()
 }
 
-func (i *Indexer) Stop() {
-	if !sem.TryAcquire(1) {
-		log.Print("indexer: trying to stop")
-		cancel()
-		return
+func (i *Indexer) Stop() error {
+	resp, err := sClient().Post("http://localhost/kill", "text/plain", nil)
+	if err != nil {
+		return err
 	}
-	sem.Release(1)
+	defer resp.Body.Close()
+
+	_, err = io.ReadAll(resp.Body)
+	if err != nil || !i.IsRunning() {
+		notifyStop()
+	}
+	return err
 }
 
 func (i *Indexer) IsRunning() bool {
-	if !sem.TryAcquire(1) {
-		return true
+	resp, err := sClient().Get("http://localhost/ping")
+	if err != nil {
+		return false
 	}
-	sem.Release(1)
-	return false
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	return string(b) == "pong"
 }
 
 type OnStartCb func()
@@ -158,4 +146,19 @@ func notifyStop() {
 	for _, f := range onStopListeners {
 		f()
 	}
+}
+
+func sClient() *http.Client {
+	clientOnce.Do(func() {
+		unixDial := func(proto, addr string) (conn net.Conn, err error) {
+			return net.Dial("unix", socketPath)
+		}
+		tr := &http.Transport{
+			Dial: unixDial,
+		}
+		socketClient = &http.Client{Transport: tr}
+
+	})
+
+	return socketClient
 }
