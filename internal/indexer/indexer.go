@@ -97,11 +97,15 @@ func (i *Indexer) Stop() error {
 	if err != nil {
 		return err
 	}
+	//nolint
 	defer resp.Body.Close()
 
 	_, err = io.ReadAll(resp.Body)
-	if err != nil || !i.IsRunning() {
-		notifyStop()
+	if err != nil {
+		log.Error().Err(err).Msg("unhandled error reading body")
+		if !i.IsRunning() {
+			notifyStop()
+		}
 	}
 	return err
 }
@@ -111,9 +115,13 @@ func (i *Indexer) IsRunning() bool {
 	if err != nil {
 		return false
 	}
+	//nolint
 	defer resp.Body.Close()
 
 	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Error().Err(err).Msg("unhandled error reading body")
+	}
 	return string(b) == "pong"
 }
 
