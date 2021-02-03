@@ -104,7 +104,7 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 	signal.Notify(sigc, os.Interrupt, os.Kill, syscall.SIGTERM)
 	go func(c chan os.Signal) {
 		sig := <-c
-		log.Printf("shutting down socket server", sig)
+		log.Printf("shutting down socket server: %v", sig)
 		unixListener.Close()
 		os.Exit(0)
 	}(sigc)
