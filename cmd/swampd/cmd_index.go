@@ -64,7 +64,7 @@ func init() {
 	appCommands = append(appCommands, cmd)
 }
 
-func socketServer(progress chan rindex.IndexStats) error {
+func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) error {
 	e := echo.New()
 	e.HideBanner = true
 	e.Logger.SetOutput(io.Discard)
@@ -86,6 +86,11 @@ func socketServer(progress chan rindex.IndexStats) error {
 
 	e.GET("/stats", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, stats)
+	})
+
+	e.POST("/kill", func(c echo.Context) error {
+		cancel()
+		return c.JSON(http.StatusOK, "shutting down")
 	})
 
 	log.Debug().Msgf("swampd socket path: %s", socketPath)
@@ -155,15 +160,20 @@ func indexRepo(cli *cli.Context) error {
 	idxOpts.DocumentBuilder = FileDocumentBuilder{}
 	idxOpts.Reindex = cli.Bool("reindex")
 
-	go socketServer(progress)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	go socketServer(cancel, progress)
 
 	if cli.Bool("monitor") {
 		go progressMonitor(cli.Bool("log-errors"), progress)
 	}
 
-	stats, err := idx.Index(context.Background(), idxOpts, progress)
+	stats, err := idx.Index(ctx, idxOpts, progress)
 	if err != nil {
-		panic(err)
+		if errors.Is(err, context.Canceled) {
+			log.Fatal().Err(err).Msg("indexing process aborted with an unknown error")
+		}
+		log.Print("indexing stopped")
 	}
 
 	fmt.Printf(
