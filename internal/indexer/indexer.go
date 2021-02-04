@@ -19,32 +19,27 @@ import (
 )
 
 type Indexer struct {
+	running          bool
+	onStopListeners  []OnStopCb
+	onStartListeners []OnStartCb
+	mutex            sync.Mutex
 }
+
+type OnStopCb func()
+type OnStartCb func()
 
 var clientOnce, once sync.Once
 var instance *Indexer
 var socketClient *http.Client
 var socketPath = filepath.Join(settings.DataDir(), "indexing.sock")
-var mutex sync.Mutex
-var running bool
 var log = zerolog.New(os.Stderr).With().Timestamp().Logger()
 
-func init() {
+func New() *Indexer {
+	i := &Indexer{}
+
 	EnableDebugging(false)
 
-	go func() {
-		ticker := time.NewTicker(30 * time.Minute)
-		for range ticker.C {
-			log.Print("indexer: trying to start swampd")
-			Daemon().Start()
-		}
-	}()
-	go func() {
-		ticker := time.NewTicker(5 * time.Second)
-		for range ticker.C {
-			toggleState()
-		}
-	}()
+	return i
 }
 
 func EnableDebugging(d bool) {
@@ -55,24 +50,39 @@ func EnableDebugging(d bool) {
 	}
 }
 
-func toggleState() {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (i *Indexer) toggleState() {
+	i.mutex.Lock()
+	defer i.mutex.Unlock()
 
-	if IsRunning() && !running {
-		running = true
+	if IsRunning() && !i.running {
+		i.running = true
 		log.Print("indexer: running, notify start")
-		notifyStart()
-	} else if !IsRunning() && running {
-		running = false
+		i.notifyStart()
+	} else if !IsRunning() && i.running {
+		i.running = false
 		log.Print("indexer: stopped, notify stop")
-		notifyStop()
+		i.notifyStop()
 	}
 }
 
 func Daemon() *Indexer {
 	once.Do(func() {
-		instance = &Indexer{}
+		instance = New()
+		go func() {
+			log.Print("indexer: starting swampd for the first time")
+			instance.Start()
+			ticker := time.NewTicker(30 * time.Minute)
+			for range ticker.C {
+				log.Print("indexer: trying to start swampd")
+				instance.Start()
+			}
+		}()
+		go func() {
+			ticker := time.NewTicker(5 * time.Second)
+			for range ticker.C {
+				instance.toggleState()
+			}
+		}()
 	})
 
 	return instance
@@ -89,7 +99,7 @@ func (i *Indexer) Start() {
 		prepo := config.PreferredRepo()
 		rs := resticsettings.New(prepo)
 
-		notifyStart()
+		i.notifyStart()
 
 		for {
 			if !resticsettings.FirstBoot() {
@@ -101,7 +111,7 @@ func (i *Indexer) Start() {
 		}
 
 		defer func() {
-			notifyStop()
+			i.notifyStop()
 			log.Print("indexer: stopped swampd")
 		}()
 
@@ -140,7 +150,7 @@ func (i *Indexer) Stop() error {
 	if err != nil {
 		log.Error().Err(err).Msg("unhandled error reading body")
 		if !IsRunning() {
-			notifyStop()
+			i.notifyStop()
 		}
 	}
 	return err
@@ -161,34 +171,26 @@ func IsRunning() bool {
 	return string(b) == "pong"
 }
 
-type OnStartCb func()
-
-var onStartListeners []OnStartCb
-
 // FIXME: not thread safe. Use sync.Map or something similar to hold
 // the callbacks
-func OnStart(fn OnStartCb) {
-	onStartListeners = append(onStartListeners, fn)
+func (i *Indexer) OnStart(fn OnStartCb) {
+	i.onStartListeners = append(i.onStartListeners, fn)
 }
 
-func notifyStart() {
-	for _, f := range onStartListeners {
+func (i *Indexer) notifyStart() {
+	for _, f := range i.onStartListeners {
 		f()
 	}
 }
 
-type OnStopCb func()
-
-var onStopListeners []OnStopCb
-
 // FIXME: not thread safe. Use sync.Map or something similar to hold
 // the callbacks
-func OnStop(fn OnStopCb) {
-	onStopListeners = append(onStopListeners, fn)
+func (i *Indexer) OnStop(fn OnStopCb) {
+	i.onStopListeners = append(i.onStopListeners, fn)
 }
 
-func notifyStop() {
-	for _, f := range onStopListeners {
+func (i *Indexer) notifyStop() {
+	for _, f := range i.onStopListeners {
 		f()
 	}
 }

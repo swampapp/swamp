@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"os/signal"
@@ -16,7 +15,7 @@ import (
 
 	"github.com/arl/statsviz"
 	"github.com/briandowns/spinner"
-	"github.com/labstack/echo/v4"
+	"github.com/gofiber/fiber/v2"
 	"github.com/muesli/reflow/padding"
 	"github.com/muesli/reflow/truncate"
 	"github.com/rubiojr/rindex"
@@ -58,16 +57,18 @@ func init() {
 }
 
 func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) error {
-	e := echo.New()
-	e.HideBanner = true
-	e.Logger.SetOutput(io.Discard)
+	f := fiber.New(
+		fiber.Config{
+			DisableStartupMessage: true,
+		},
+	)
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "swampd daemon socket")
+	f.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("")
 	})
 
-	e.GET("/ping", func(c echo.Context) error {
-		return c.String(http.StatusOK, "pong")
+	f.Get("/ping", func(c *fiber.Ctx) error {
+		return c.SendString("pong")
 	})
 
 	var stats rindex.IndexStats
@@ -77,14 +78,14 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 		}
 	}()
 
-	e.GET("/stats", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, stats)
+	f.Get("/stats", func(c *fiber.Ctx) error {
+		return c.JSON(stats)
 	})
 
-	e.POST("/kill", func(c echo.Context) error {
+	f.Post("/kill", func(c *fiber.Ctx) error {
 		log.Debug().Msg("swampd was told to quit")
 		cancel()
-		return c.JSON(http.StatusOK, "shutting down")
+		return c.SendString("shutting down")
 	})
 
 	log.Debug().Msgf("swampd socket path: %s", indexer.SocketPath())
@@ -102,10 +103,10 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 		os.Exit(0)
 	}(sigc)
 
-	e.Listener = unixListener
+	f.Listener(unixListener)
 
 	log.Print("unix socket server starting")
-	return e.Start("")
+	return f.Listen("")
 }
 
 func indexRepo(cli *cli.Context) error {

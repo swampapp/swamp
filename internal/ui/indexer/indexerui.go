@@ -42,7 +42,7 @@ func New() *Indexer {
 
 	indexer.EnableDebugging(true)
 
-	indexer.OnStop(func() {
+	indexer.Daemon().OnStop(func() {
 		glib.IdleAdd(func() {
 			i.indexButton.SetLabel("Start Indexing")
 			resources.UpdateImageFromResource(i.indexAnimation, "indexing-done")
@@ -50,7 +50,7 @@ func New() *Indexer {
 		})
 	})
 
-	indexer.OnStart(func() {
+	indexer.Daemon().OnStart(func() {
 		//log.Print("indexerui: notification received")
 		glib.IdleAdd(func() {
 			i.indexButton.SetLabel("Stop Indexing")

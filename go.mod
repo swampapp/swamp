@@ -11,10 +11,10 @@ require (
 	github.com/blugelabs/bluge v0.1.5-0.20201230014014-ee2b8ea003e8
 	github.com/briandowns/spinner v1.11.1
 	github.com/dustin/go-humanize v1.0.0
+	github.com/gofiber/fiber/v2 v2.4.1
 	github.com/gotk3/gotk3 v0.5.2-0.20201210053409-82632d18c6e1
-	github.com/labstack/echo/v4 v4.1.17
 	github.com/manifoldco/promptui v0.8.0
-	github.com/muesli/go-app-paths v0.2.1
+	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/muesli/reflow v0.2.1-0.20201103142440-d06e0479f1e5
 	github.com/muesli/termenv v0.7.4
 	github.com/pkg/errors v0.9.1
@@ -25,6 +25,5 @@ require (
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/vmihailenco/msgpack/v5 v5.1.0
 	github.com/zalando/go-keyring v0.1.0
-	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	gopkg.in/yaml.v2 v2.3.0
 )
