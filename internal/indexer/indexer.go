@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/resticsettings"
@@ -25,8 +25,13 @@ var clientOnce, once sync.Once
 var instance *Indexer
 var socketClient *http.Client
 var socketPath = filepath.Join(settings.DataDir(), "indexing.sock")
+var mutex sync.Mutex
+var running bool
+var log = zerolog.New(os.Stderr).With().Timestamp().Logger()
 
 func init() {
+	EnableDebugging(false)
+
 	go func() {
 		ticker := time.NewTicker(30 * time.Minute)
 		for range ticker.C {
@@ -34,6 +39,35 @@ func init() {
 			Daemon().Start()
 		}
 	}()
+	go func() {
+		ticker := time.NewTicker(5 * time.Second)
+		for range ticker.C {
+			toggleState()
+		}
+	}()
+}
+
+func EnableDebugging(d bool) {
+	if d {
+		log = log.Level(zerolog.DebugLevel)
+	} else {
+		log = log.Level(zerolog.InfoLevel)
+	}
+}
+
+func toggleState() {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if IsRunning() && !running {
+		running = true
+		log.Print("indexer: running, notify start")
+		notifyStart()
+	} else if !IsRunning() && running {
+		running = false
+		log.Print("indexer: stopped, notify stop")
+		notifyStop()
+	}
 }
 
 func Daemon() *Indexer {
@@ -136,6 +170,7 @@ var onStartListeners []OnStartCb
 func OnStart(fn OnStartCb) {
 	onStartListeners = append(onStartListeners, fn)
 }
+
 func notifyStart() {
 	for _, f := range onStartListeners {
 		f()

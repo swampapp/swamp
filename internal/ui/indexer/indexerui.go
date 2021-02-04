@@ -40,6 +40,8 @@ func New() *Indexer {
 		resources.UpdateImageFromResource(i.indexAnimation, "indexing-done")
 	}
 
+	indexer.EnableDebugging(true)
+
 	indexer.OnStop(func() {
 		glib.IdleAdd(func() {
 			i.indexButton.SetLabel("Start Indexing")

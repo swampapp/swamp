@@ -109,6 +109,8 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 }
 
 func indexRepo(cli *cli.Context) error {
+	indexer.EnableDebugging(cli.Bool("debug"))
+
 	_, err := os.Stat(indexer.SocketPath())
 	if err != nil {
 		if !os.IsNotExist(err) {
