@@ -46,7 +46,7 @@ func Instance() *MainWindow {
 
 func New(a *gtk.Application) (*MainWindow, error) {
 	screen, _ := gdk.ScreenGetDefault()
-	gtk.AddProviderForScreen(screen, resources.CSS(), 1)
+	gtk.AddProviderForScreen(screen, resources.CSS(), gtk.STYLE_PROVIDER_PRIORITY_USER)
 
 	w, err := gtk.ApplicationWindowNew(a)
 	if err != nil {
