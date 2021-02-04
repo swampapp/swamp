@@ -4,30 +4,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/blugelabs/bluge"
-	gap "github.com/muesli/go-app-paths"
+	"github.com/rs/zerolog"
 	"github.com/rubiojr/rapi"
 	"github.com/urfave/cli/v2"
 )
 
 var appCommands []*cli.Command
 var globalOptions = rapi.DefaultOptions
-var blugeConf bluge.Config
 var indexPath string
-
-func initApp() {
-	os.MkdirAll(indexPath, 0755)
-	blugeConf = bluge.DefaultConfig(indexPath)
-}
-
-func defaultDataDir() string {
-	scope := gap.NewScope(gap.User, "swamp")
-	dirs, err := scope.DataDirs()
-	if err != nil {
-		panic(err)
-	}
-	return dirs[0]
-}
+var log = zerolog.New(os.Stderr).With().Timestamp().Logger()
 
 func main() {
 	var err error
@@ -35,6 +20,13 @@ func main() {
 		Name:     "swampd",
 		Commands: []*cli.Command{},
 		Version:  "v0.1.0",
+		Before: func(c *cli.Context) error {
+			log = log.Level(zerolog.InfoLevel)
+			if c.Bool("debug") {
+				log = log.Level(zerolog.DebugLevel)
+			}
+			return nil
+		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "repo",

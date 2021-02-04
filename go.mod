@@ -12,6 +12,7 @@ require (
 	github.com/briandowns/spinner v1.11.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gotk3/gotk3 v0.5.2-0.20201210053409-82632d18c6e1
+	github.com/labstack/echo/v4 v4.1.17
 	github.com/manifoldco/promptui v0.8.0
 	github.com/muesli/go-app-paths v0.2.1
 	github.com/muesli/reflow v0.2.1-0.20201103142440-d06e0479f1e5

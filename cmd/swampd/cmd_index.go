@@ -2,8 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
+	"io"
+	"net"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"net/http"
@@ -11,9 +16,11 @@ import (
 
 	"github.com/arl/statsviz"
 	"github.com/briandowns/spinner"
+	"github.com/labstack/echo/v4"
 	"github.com/muesli/reflow/padding"
 	"github.com/muesli/reflow/truncate"
 	"github.com/rubiojr/rindex"
+	"github.com/swampapp/swamp/internal/indexer"
 	"github.com/urfave/cli/v2"
 )
 
@@ -50,11 +57,80 @@ func init() {
 	appCommands = append(appCommands, cmd)
 }
 
-func indexRepo(cli *cli.Context) error {
-	statsviz.RegisterDefault()
+func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) error {
+	e := echo.New()
+	e.HideBanner = true
+	e.Logger.SetOutput(io.Discard)
+
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "swampd daemon socket")
+	})
+
+	e.GET("/ping", func(c echo.Context) error {
+		return c.String(http.StatusOK, "pong")
+	})
+
+	var stats rindex.IndexStats
 	go func() {
-		log.Print(http.ListenAndServe("localhost:6060", nil))
+		for stats = range progress {
+			time.Sleep(100 * time.Millisecond)
+		}
 	}()
+
+	e.GET("/stats", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, stats)
+	})
+
+	e.POST("/kill", func(c echo.Context) error {
+		log.Debug().Msg("swampd was told to quit")
+		cancel()
+		return c.JSON(http.StatusOK, "shutting down")
+	})
+
+	log.Debug().Msgf("swampd socket path: %s", indexer.SocketPath())
+	unixListener, err := net.Listen("unix", indexer.SocketPath())
+	if err != nil {
+		panic(err)
+	}
+
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
+	go func(c chan os.Signal) {
+		sig := <-c
+		log.Printf("shutting down socket server: %v", sig)
+		unixListener.Close()
+		os.Exit(0)
+	}(sigc)
+
+	e.Listener = unixListener
+
+	log.Print("unix socket server starting")
+	return e.Start("")
+}
+
+func indexRepo(cli *cli.Context) error {
+	indexer.EnableDebugging(cli.Bool("debug"))
+
+	_, err := os.Stat(indexer.SocketPath())
+	if err != nil {
+		if !os.IsNotExist(err) {
+			panic(err)
+		}
+	} else {
+		if indexer.IsRunning() {
+			return errors.New("swampd is already running")
+		}
+		log.Warn().Msgf("socket file found in %s, but looks stale, removing", indexer.SocketPath())
+		os.Remove(indexer.SocketPath())
+	}
+
+	if err := statsviz.RegisterDefault(); err == nil {
+		go func() {
+			log.Print(http.ListenAndServe("localhost:6060", nil))
+		}()
+	} else {
+		log.Error().Err(err).Msg("error running statsviz")
+	}
 
 	progress := make(chan rindex.IndexStats, 10)
 	idx, err := rindex.New(indexPath, globalOptions.Repo, globalOptions.Password)
@@ -66,66 +142,104 @@ func indexRepo(cli *cli.Context) error {
 	idxOpts.DocumentBuilder = FileDocumentBuilder{}
 	idxOpts.Reindex = cli.Bool("reindex")
 
+	ctx, cancel := context.WithCancel(context.Background())
+
+	go func() {
+		if err := socketServer(cancel, progress); err != nil {
+			log.Error().Err(err).Msg("socket server returned an error")
+		}
+	}()
+
 	if cli.Bool("monitor") {
 		go progressMonitor(cli.Bool("log-errors"), progress)
 	}
 
-	stats, err := idx.Index(context.Background(), idxOpts, progress)
+	stats, err := idx.Index(ctx, idxOpts, progress)
 	if err != nil {
-		panic(err)
+		if errors.Is(err, context.Canceled) {
+			log.Fatal().Err(err).Msg("indexing process aborted with an unknown error")
+		}
+		log.Print("indexing stopped")
 	}
-	fmt.Printf(
-		"\n💥 %d indexed, %d already present. %d new snapshots. Took %d seconds.\n",
-		stats.IndexedFiles,
-		stats.AlreadyIndexed,
-		stats.ScannedSnapshots,
-		int(time.Since(tStart).Seconds()),
-	)
-	return nil
+
+	if cli.Bool("monitor") {
+		fmt.Printf(
+			"\n💥 %d indexed, %d already present. %d new snapshots. Took %d seconds.\n",
+			stats.IndexedFiles,
+			stats.AlreadyIndexed,
+			stats.ScannedSnapshots,
+			int(time.Since(tStart).Seconds()),
+		)
+	} else {
+		log.Info().Msgf(
+			"%d indexed, %d already present. %d new snapshots. Took %d seconds.\n",
+			stats.IndexedFiles,
+			stats.AlreadyIndexed,
+			stats.ScannedSnapshots,
+			int(time.Since(tStart).Seconds()),
+		)
+
+	}
+	return os.Remove(indexer.SocketPath())
 }
 
 func progressMonitor(logErrors bool, progress chan rindex.IndexStats) {
-	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+	s := spinner.New(spinner.CharSets[11], 200*time.Millisecond)
+	//nolint
 	s.Color("fgGreen")
 	fmt.Println()
 	s.Suffix = " Analyzing the repository..."
-	lastError := ""
+
 	for {
-		select {
-		case p := <-progress:
-			if logErrors {
-				if len(p.Errors) > 0 {
-					e := p.Errors[len(p.Errors)-1].Error()
-					if e != lastError {
-						fmt.Println("\n", e)
-						lastError = e
-					}
-				}
+		p, err := indexer.Stats()
+		if err != nil {
+			log.Error().Err(err).Msgf("error reading stats")
+			continue
+		}
+		printStats(logErrors, p, s)
+		time.Sleep(200 * time.Millisecond)
+	}
+}
+
+var lastError = ""
+
+func printStats(logErrors bool, p rindex.IndexStats, s *spinner.Spinner) {
+	if logErrors {
+		if len(p.Errors) > 0 {
+			e := p.Errors[len(p.Errors)-1].Error()
+			if e != lastError {
+				fmt.Println("\n", e)
+				lastError = e
 			}
-			lm := p.LastMatch
-			if lm == "" {
-				lm = "Searching for files..."
-			}
-			ls := truncate.StringWithTail(lm, statusStrLen, "...")
-			rate := float64(p.ScannedNodes*1000000000) / float64(time.Since(tStart))
-			percentage := uint64(0)
-			if p.CurrentSnapshotTotalFiles > 0 {
-				percentage = (p.CurrentSnapshotFiles * 100) / p.CurrentSnapshotTotalFiles
-			}
-			s.Suffix = fmt.Sprintf(
-				"\033[F🎯  %s\n%d new, %d alredy indexed, %d errors, %.0f f/s, %d scanned (%d%%), %d/%d snapshots",
-				padding.String(ls, statusStrLen),
-				p.IndexedFiles,
-				p.AlreadyIndexed,
-				len(p.Errors),
-				rate,
-				p.CurrentSnapshotFiles,
-				percentage,
-				p.ScannedSnapshots,
-				p.MissingSnapshots,
-			)
-		default:
-			time.Sleep(100 * time.Millisecond)
 		}
 	}
+
+	// Wait until a file has been scanned to start printing progress
+	if p.ScannedFiles == 0 {
+		return
+	}
+
+	lm := p.LastMatch
+	if lm == "" {
+		lm = "Searching for files..."
+	}
+	ls := truncate.StringWithTail(lm, statusStrLen, "...")
+	rate := float64(p.ScannedNodes*1000000000) / float64(time.Since(tStart))
+	percentage := uint64(0)
+	if p.CurrentSnapshotTotalFiles > 0 {
+		percentage = (p.CurrentSnapshotFiles * 100) / p.CurrentSnapshotTotalFiles
+	}
+
+	s.Suffix = fmt.Sprintf(
+		"\033[F🎯  %s\n%d new, %d alredy indexed, %d errors, %.0f f/s, %d scanned (%d%%), %d/%d snapshots",
+		padding.String(ls, statusStrLen),
+		p.IndexedFiles,
+		p.AlreadyIndexed,
+		len(p.Errors),
+		rate,
+		p.CurrentSnapshotFiles,
+		percentage,
+		p.ScannedSnapshots,
+		p.MissingSnapshots,
+	)
 }
