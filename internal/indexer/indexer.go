@@ -37,7 +37,7 @@ var log = zerolog.New(os.Stderr).With().Timestamp().Logger()
 func New() *Indexer {
 	i := &Indexer{}
 
-	EnableDebugging(false)
+	EnableDebugging(true)
 
 	return i
 }
