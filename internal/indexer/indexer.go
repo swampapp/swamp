@@ -218,6 +218,7 @@ func Stats() (rindex.IndexStats, error) {
 	resp, err := Client().Get("http://localhost/stats")
 	if err != nil {
 		log.Print("error fetching stats")
+		return rindex.IndexStats{}, err
 	}
 	defer resp.Body.Close()
 
