@@ -97,8 +97,9 @@ func (i *Indexer) start() {
 	resources.UpdateImageFromResource(i.indexAnimation, "indexing")
 
 	rss := i.swampdRSS()
-	i.statusLbl.SetText(fmt.Sprintf("swampd memory: %s       New Files: %d      Missing Snapshots: %d",
+	i.statusLbl.SetText(fmt.Sprintf("Indexer Memory: %s       Added Files: %d      Snapshots: [%d/%d]",
 		rss,
+		0,
 		0,
 		0,
 	))
@@ -127,7 +128,7 @@ func (i *Indexer) start() {
 					if stats.ScannedFiles > 0 {
 						i.statusProgress.SetText(fmt.Sprintf("Snapshot Progress: %d%%", int(percentage*100)))
 					}
-					i.statusLbl.SetText(fmt.Sprintf("swampd memory: %s       New Files: %d      Snapshots [%d/%d]",
+					i.statusLbl.SetText(fmt.Sprintf("Indexer Memory: %s       Added Files: %d      Snapshots [%d/%d]",
 						rss,
 						stats.IndexedFiles,
 						stats.ScannedSnapshots,
