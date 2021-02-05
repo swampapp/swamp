@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"time"
 
@@ -231,4 +232,21 @@ func Stats() (rindex.IndexStats, error) {
 	err = json.Unmarshal(b, &p)
 
 	return p, err
+}
+
+func Pid() (int, error) {
+	resp, err := Client().Get("http://localhost/pid")
+	if err != nil {
+		log.Print("error fetching stats")
+		return -1, err
+	}
+	defer resp.Body.Close()
+
+	var pid int
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return pid, err
+	}
+
+	return strconv.Atoi(string(b))
 }

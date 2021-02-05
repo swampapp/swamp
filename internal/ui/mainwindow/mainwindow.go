@@ -36,6 +36,7 @@ type MainWindow struct {
 	tagList        *taglist.TagList
 	paned          *gtk.Paned
 	searchText     string
+	indexerUI      *indexer.Indexer
 }
 
 var mw *MainWindow
@@ -70,6 +71,7 @@ func New(a *gtk.Application) (*MainWindow, error) {
 		inprogressList:    inprogresslist.New(),
 		tagList:           taglist.New(),
 		fileList:          filelist.New(),
+		indexerUI:         indexer.New(),
 	}
 
 	resources.LoadImages()
@@ -181,7 +183,7 @@ func (w *MainWindow) SetMainPanel(t string) {
 	case "In Progress":
 		w.paned.Add2(w.inprogressList)
 	case "Indexer":
-		w.paned.Add2(indexer.New())
+		w.paned.Add2(w.indexerUI)
 	case "Settings":
 		w.paned.Add2(settingsui.New())
 	default:

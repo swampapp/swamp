@@ -30,6 +30,8 @@ const statusStrLen = 40
 // higher than this could cause trouble with mem usage and file descriptors
 const batchSize = 300
 
+var pid int
+
 func init() {
 	cmd := &cli.Command{
 		Name:   "index",
@@ -82,6 +84,10 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 		return c.JSON(stats)
 	})
 
+	f.Get("/pid", func(c *fiber.Ctx) error {
+		return c.SendString(fmt.Sprintf("%d", pid))
+	})
+
 	f.Post("/kill", func(c *fiber.Ctx) error {
 		log.Debug().Msg("swampd was told to quit")
 		cancel()
@@ -112,6 +118,7 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 func indexRepo(cli *cli.Context) error {
 	indexer.EnableDebugging(cli.Bool("debug"))
 
+	pid = os.Getpid()
 	_, err := os.Stat(indexer.SocketPath())
 	if err != nil {
 		if !os.IsNotExist(err) {
