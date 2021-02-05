@@ -50,9 +50,7 @@ func New() *Indexer {
 	indexer.EnableDebugging(true)
 
 	indexer.Daemon().OnStop(func() {
-		glib.IdleAdd(func() {
-			i.cancelFunc()
-		})
+		i.cancelFunc()
 	})
 
 	indexer.Daemon().OnStart(func() {
@@ -63,6 +61,7 @@ func New() *Indexer {
 }
 
 func (i *Indexer) stop() {
+	log.Print("indexerui: stop")
 	i.statusProgress.SetFraction(1)
 	i.indexButton.SetLabel("Start Indexing")
 	resources.UpdateImageFromResource(i.indexAnimation, "indexing-done")
@@ -91,18 +90,25 @@ func (i *Indexer) swampdRSS() string {
 
 	return humanize.Bytes(uint64(pstats.ResidentMemory()))
 }
+
 func (i *Indexer) start() {
-	i.indexButton.SetLabel("Stop Indexing")
-	i.statusProgress.SetText("Preparing to index repository...")
-	resources.UpdateImageFromResource(i.indexAnimation, "indexing")
+	log.Print("indexerui: start")
+	i.ctx, i.cancelFunc = context.WithCancel(context.Background())
 
 	rss := i.swampdRSS()
-	i.statusLbl.SetText(fmt.Sprintf("Indexer Memory: %s       Added Files: %d      Snapshots: [%d/%d]",
-		rss,
-		0,
-		0,
-		0,
-	))
+
+	glib.IdleAdd(func() {
+		i.indexButton.SetLabel("Stop Indexing")
+		i.statusProgress.SetText("Preparing to index repository...")
+		resources.UpdateImageFromResource(i.indexAnimation, "indexing")
+		i.statusLbl.SetText(fmt.Sprintf("Indexer Memory: %s       Added Files: %d      Snapshots: [%d/%d]",
+			rss,
+			0,
+			0,
+			0,
+		))
+	})
+
 	go func() {
 		for {
 			select {
@@ -112,6 +118,8 @@ func (i *Indexer) start() {
 				})
 				return
 			default:
+				// give swampd some time to start
+				time.Sleep(1 * time.Second)
 				rss = i.swampdRSS()
 				if rss == "0" {
 					continue
@@ -136,7 +144,6 @@ func (i *Indexer) start() {
 					))
 					i.statusProgress.SetFraction(percentage)
 				})
-				time.Sleep(1 * time.Second)
 			}
 		}
 	}()

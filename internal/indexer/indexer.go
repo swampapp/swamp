@@ -72,7 +72,7 @@ func Daemon() *Indexer {
 		go func() {
 			log.Print("indexer: starting swampd for the first time")
 			instance.Start()
-			ticker := time.NewTicker(30 * time.Minute)
+			ticker := time.NewTicker(60 * time.Minute)
 			for range ticker.C {
 				log.Print("indexer: trying to start swampd")
 				instance.Start()
