@@ -334,8 +334,12 @@ github.com/rubiojr/gotk3 v0.6.1-0.20210116142446-e7c4bc251504 h1:fSpTwyWxDFEinPz
 github.com/rubiojr/gotk3 v0.6.1-0.20210116142446-e7c4bc251504/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
 github.com/rubiojr/rapi v0.0.0-20201230200601-5ed59be0451f h1:VanA3c939PVRauBr3dNxUiqNgKEyFMEYk/acousRI0A=
 github.com/rubiojr/rapi v0.0.0-20201230200601-5ed59be0451f/go.mod h1:Ft+bi8loIdZ4C9AcPVFPlNXh9rVkBMLWgQGQhNL+CaE=
+github.com/rubiojr/rapi v0.0.0-20210207130800-0aa798817d93 h1:/96AUKgzS2MQJQjBY9fKLQSHtSAHwlR0a+m0NrBxVo8=
+github.com/rubiojr/rapi v0.0.0-20210207130800-0aa798817d93/go.mod h1:Ft+bi8loIdZ4C9AcPVFPlNXh9rVkBMLWgQGQhNL+CaE=
 github.com/rubiojr/rindex v0.0.0-20210131170506-4294f994bfcc h1:q14hUOgdD2Nyc5j1jlufmdZEnBB1Q9ipypPHN5ZVhDU=
 github.com/rubiojr/rindex v0.0.0-20210131170506-4294f994bfcc/go.mod h1:5xzXOd8ez7+2TkvRNqNxsRCo2ro5o+8GbNAkIfzbUGI=
+github.com/rubiojr/rindex v0.0.0-20210207144532-44001bab5322 h1:QYrae5/v3OpJo200s4qk5IV8dbcMFuEogYHAZYBDaGk=
+github.com/rubiojr/rindex v0.0.0-20210207144532-44001bab5322/go.mod h1:P/CV1tUZ9mqLRWFeGBLGpVA7CE7/vsJ0n6fxd9mACSI=
 github.com/russross/blackfriday v1.5.2 h1:HyvC0ARfnZBqnXwABFeSZHpKvJHJJfPz81GNueLj0oo=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday/v2 v2.0.1 h1:lPqVAte+HuHNfhJ/0LC98ESWRz8afy9tM/0RK8m9o+Q=
