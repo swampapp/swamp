@@ -14,7 +14,7 @@ import (
 const (
 	TYPE_AUDIO = "ext:wav ext:mp3 ext:ogg ext:flac"
 	TYPE_VIDEO = "ext:mp4 ext:mkv ext:avi ext:webm ext:mov"
-	TYPE_DOC   = "ext:doc ext:docm ext:pdf ext:docx ext:odf ext:pages ext:rtf"
+	TYPE_DOC   = "ext:doc ext:docm ext:pdf ext:docx ext:odf ext:pages ext:rtf ext:html ext:webarchive"
 	TYPE_IMAGE = "ext:jpg ext:jpeg ext:png ext:gif ext:tiff ext:eps ext:raw"
 	TYPE_EBOOK = "ext:fb2 ext:ibook ext:cbr ext:djvu ext:epub ext:mobi"
 )

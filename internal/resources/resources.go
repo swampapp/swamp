@@ -85,7 +85,7 @@ func ImageForDoc(name string) *gdk.Pixbuf {
 		return imageVideo
 	case ".mp3", ".flac", ".ogg", ".wav", ".m4p":
 		return imageAudio
-	case ".pdf", ".doc", ".xls", ".txt", ".md", ".rst":
+	case ".pdf", ".doc", ".xls", ".txt", ".md", ".rst", ".webarchive", ".html", ".pages", ".odf":
 		return imageDoc
 	case ".zip", ".tar", ".tgz", ".rar", ".gz", ".bz2", ".xz":
 		return imageCompressed
