@@ -356,8 +356,8 @@ func (f *FileList) setup() {
 }
 
 func (f *FileList) updateFileList(query string) {
-	f.notDownloadedImg = resources.ImageForDoc("XXX")
-	f.downloadedImg = resources.ImageForDoc("some.cloud")
+	f.notDownloadedImg = resources.ImageForDoc("some.cloud")
+	f.downloadedImg = resources.ImageForDoc("XXX")
 	f.treeView.Clear()
 	if !f.searchTags(query) {
 		f.searchIndex(query)
