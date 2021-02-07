@@ -18,6 +18,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/muesli/reflow/padding"
 	"github.com/muesli/reflow/truncate"
+	"github.com/prometheus/procfs"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/indexer"
 	"github.com/urfave/cli/v2"
@@ -71,6 +72,30 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 
 	f.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendString("pong")
+	})
+
+	f.Get("/procstats", func(c *fiber.Ctx) error {
+		p, err := procfs.NewProc(pid)
+		if err != nil {
+			log.Error().Err(err).Msgf("could not get process: %s", err)
+			return err
+		}
+		pstats, err := p.NewStat()
+		if err != nil {
+			log.Error().Err(err).Msgf("could not get process stat: %s", err)
+			return err
+		}
+
+		rss := uint64(pstats.ResidentMemory())
+
+		s := indexer.ProcStats{
+			RSS:       rss,
+			Duration:  uint64(time.Since(tStart).Seconds()),
+			StartTime: tStart,
+			CpuTime:   uint64(pstats.CPUTime()),
+		}
+
+		return c.JSON(s)
 	})
 
 	var stats rindex.IndexStats

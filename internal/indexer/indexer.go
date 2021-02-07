@@ -250,3 +250,29 @@ func Pid() (int, error) {
 
 	return strconv.Atoi(string(b))
 }
+
+type ProcStats struct {
+	RSS       uint64
+	Duration  uint64
+	StartTime time.Time
+	CpuTime   uint64
+}
+
+func GetProcStats() (ProcStats, error) {
+	var procStats ProcStats
+	resp, err := Client().Get("http://localhost/procstats")
+	if err != nil {
+		log.Print("error fetching stats")
+		return procStats, err
+	}
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return procStats, err
+	}
+
+	err = json.Unmarshal(b, &procStats)
+
+	return procStats, err
+}
