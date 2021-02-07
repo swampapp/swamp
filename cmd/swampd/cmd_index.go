@@ -18,6 +18,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/muesli/reflow/padding"
 	"github.com/muesli/reflow/truncate"
+	"github.com/prometheus/procfs"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/indexer"
 	"github.com/urfave/cli/v2"
@@ -29,6 +30,8 @@ const statusStrLen = 40
 
 // higher than this could cause trouble with mem usage and file descriptors
 const batchSize = 300
+
+var pid int
 
 func init() {
 	cmd := &cli.Command{
@@ -71,6 +74,30 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 		return c.SendString("pong")
 	})
 
+	f.Get("/procstats", func(c *fiber.Ctx) error {
+		p, err := procfs.NewProc(pid)
+		if err != nil {
+			log.Error().Err(err).Msgf("could not get process: %s", err)
+			return err
+		}
+		pstats, err := p.Stat()
+		if err != nil {
+			log.Error().Err(err).Msgf("could not get process stat: %s", err)
+			return err
+		}
+
+		rss := uint64(pstats.ResidentMemory())
+
+		s := indexer.ProcStats{
+			RSS:       rss,
+			Duration:  uint64(time.Since(tStart).Seconds()),
+			StartTime: tStart,
+			CpuTime:   uint64(pstats.CPUTime()),
+		}
+
+		return c.JSON(s)
+	})
+
 	var stats rindex.IndexStats
 	go func() {
 		for stats = range progress {
@@ -80,6 +107,10 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 
 	f.Get("/stats", func(c *fiber.Ctx) error {
 		return c.JSON(stats)
+	})
+
+	f.Get("/pid", func(c *fiber.Ctx) error {
+		return c.SendString(fmt.Sprintf("%d", pid))
 	})
 
 	f.Post("/kill", func(c *fiber.Ctx) error {
@@ -103,7 +134,10 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 		os.Exit(0)
 	}(sigc)
 
-	f.Listener(unixListener)
+	err = f.Listener(unixListener)
+	if err != nil {
+		log.Fatal().Err(err).Msg("error setting custom UNIX listener")
+	}
 
 	log.Print("unix socket server starting")
 	return f.Listen("")
@@ -112,6 +146,7 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 func indexRepo(cli *cli.Context) error {
 	indexer.EnableDebugging(cli.Bool("debug"))
 
+	pid = os.Getpid()
 	_, err := os.Stat(indexer.SocketPath())
 	if err != nil {
 		if !os.IsNotExist(err) {

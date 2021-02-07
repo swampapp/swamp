@@ -2,7 +2,7 @@
 
 Swamp indexes Restic repositories using a background process, `swampd`.
 
-The indexing process runs periodically every 30 minutes, and the application communicates with it using a UNIX socket (`$HOME/.local/share/com.github.swampd/indexing.sock`).
+The indexing process runs periodically every 60 minutes, and the application communicates with it using a UNIX socket (`$HOME/.local/share/com.github.swampd/indexing.sock`).
 
 The indexing process exposes 3 HTTP endpoints:
 

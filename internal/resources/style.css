@@ -1,5 +1,53 @@
-.blacklbl {background-color: black}
-.indexingIMG {background-color: black}
-.assistant-page-1 {background-image: url("resource:///images/dark/assistant-background")}
-.assistant-background {background-image: url("resource:///images/dark/assistant-background")}
-.transparent-background {background-color: transparent}
+.blacklbl {
+    background-color: black
+}
+
+.indexingIMG {
+    background-color: black
+}
+
+progressbar {
+    background-color: black;
+}
+
+progressbar text {
+    background-color: black;
+    color: #2accfc;
+    margin-bottom: 5px;
+}
+
+progressbar trough.empty {
+    min-height: 12px;
+    border-color: #2accfc;
+    background-color: black;
+}
+
+progressbar trough.full {
+    min-height: 12px;
+    border-color: #2accfc;
+    background-color: #2accfc;
+}
+
+progressbar trough {
+    min-height: 12px;
+    background-color: black;
+}
+
+progressbar progress {
+    color: #2accfc;
+    background-color: #2accfc;
+    min-height: 12px;
+    border-color: #2accfc;
+}
+
+.assistant-page-1 {
+    background-image: url("resource:///images/dark/assistant-background")
+}
+
+.assistant-background {
+    background-image: url("resource:///images/dark/assistant-background")
+}
+
+.transparent-background {
+    background-color: transparent
+}

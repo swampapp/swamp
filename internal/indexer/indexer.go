@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"time"
 
@@ -71,7 +72,7 @@ func Daemon() *Indexer {
 		go func() {
 			log.Print("indexer: starting swampd for the first time")
 			instance.Start()
-			ticker := time.NewTicker(30 * time.Minute)
+			ticker := time.NewTicker(60 * time.Minute)
 			for range ticker.C {
 				log.Print("indexer: trying to start swampd")
 				instance.Start()
@@ -231,4 +232,47 @@ func Stats() (rindex.IndexStats, error) {
 	err = json.Unmarshal(b, &p)
 
 	return p, err
+}
+
+func Pid() (int, error) {
+	resp, err := Client().Get("http://localhost/pid")
+	if err != nil {
+		log.Print("error fetching stats")
+		return -1, err
+	}
+	defer resp.Body.Close()
+
+	var pid int
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return pid, err
+	}
+
+	return strconv.Atoi(string(b))
+}
+
+type ProcStats struct {
+	RSS       uint64
+	Duration  uint64
+	StartTime time.Time
+	CpuTime   uint64
+}
+
+func GetProcStats() (ProcStats, error) {
+	var procStats ProcStats
+	resp, err := Client().Get("http://localhost/procstats")
+	if err != nil {
+		log.Print("error fetching stats")
+		return procStats, err
+	}
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return procStats, err
+	}
+
+	err = json.Unmarshal(b, &procStats)
+
+	return procStats, err
 }
