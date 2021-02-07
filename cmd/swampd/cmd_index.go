@@ -80,7 +80,7 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 			log.Error().Err(err).Msgf("could not get process: %s", err)
 			return err
 		}
-		pstats, err := p.NewStat()
+		pstats, err := p.Stat()
 		if err != nil {
 			log.Error().Err(err).Msgf("could not get process stat: %s", err)
 			return err
@@ -134,7 +134,10 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 		os.Exit(0)
 	}(sigc)
 
-	f.Listener(unixListener)
+	err = f.Listener(unixListener)
+	if err != nil {
+		log.Fatal().Err(err).Msg("error setting custom UNIX listener")
+	}
 
 	log.Print("unix socket server starting")
 	return f.Listen("")
