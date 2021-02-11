@@ -164,6 +164,7 @@ func addRepo(c *cli.Context) error {
 	ropts.Repo = uri
 	ropts.Password = pass
 	repo, err := rapi.OpenRepository(ropts)
+	retry := false
 	if err != nil {
 		fmt.Printf("\nRepository credendials failed.")
 		prompt = promptui.Prompt{
@@ -175,8 +176,14 @@ func addRepo(c *cli.Context) error {
 			fmt.Println("aborting.")
 			os.Exit(0)
 		}
+		retry = true
 		addRepo(c)
 	}
+
+	if retry {
+		return nil
+	}
+
 	fmt.Println("✅")
 
 	repoID := repo.Config().ID
