@@ -6,18 +6,18 @@ import (
 	"os/exec"
 
 	"github.com/gotk3/gotk3/glib"
-	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/index"
+	"github.com/swampapp/swamp/internal/logger"
 )
 
 func Stream(fileID string) error {
 	idx, err := index.Client()
 	if err != nil {
-		log.Error().Err(err).Msg("error initializing the index")
+		logger.Error(err, "error initializing the index")
 		return err
 	}
 
-	log.Print("streaming ", fileID)
+	logger.Print("streaming ", fileID)
 
 	cmd, err := findPlayer()
 	if err != nil {
@@ -45,15 +45,15 @@ func Stream(fileID string) error {
 		})
 		err = idx.Fetch(ctx, fileID, stdin)
 		if err != nil && err != context.Canceled {
-			log.Error().Err(err).Msg("error streaming file")
+			logger.Error(err, "error streaming file")
 			return
 		}
-		log.Info().Msg("streaming finished")
+		logger.Info("streaming finished")
 	}()
 
 	err = cmd.Run()
 	if err != nil {
-		log.Error().Err(err).Msgf("error playing file %s", fileID)
+		logger.Errorf(err, "error playing file %s", fileID)
 		return err
 	}
 	return err

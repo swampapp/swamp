@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/blugelabs/bluge"
-	"github.com/rs/zerolog/log"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/swampapp/swamp/internal/settings"
 )
@@ -40,7 +40,7 @@ func GetDocument(id string) (Document, error) {
 		if field == "size" {
 			size, err := bluge.DecodeNumericFloat64(value)
 			if err != nil {
-				log.Error().Err(err).Msg("error decoding file size")
+				logger.Error(err, "error decoding file size")
 			}
 			doc.Size = fmt.Sprintf("%.0f", size)
 		}
@@ -62,7 +62,7 @@ func NeedsIndexing(id string) (bool, error) {
 
 	missing, err := idx.MissingSnapshots(context.Background())
 	if len(missing) > 0 {
-		log.Printf("%d missing snapshots found", len(missing))
+		logger.Printf("%d missing snapshots found", len(missing))
 	}
 
 	return len(missing) > 0, err

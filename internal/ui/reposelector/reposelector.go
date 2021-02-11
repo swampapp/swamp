@@ -1,11 +1,10 @@
 package reposelector
 
 import (
-	"github.com/rs/zerolog/log"
-
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/ui/component"
 )
 
@@ -60,7 +59,7 @@ func (rs *RepoSelector) populate() {
 			[]int{0, 1},
 			[]interface{}{repo.Name, repo.ID})
 		if err != nil {
-			log.Print("Unable to add row")
+			logger.Print("Unable to add row")
 			panic(err)
 		}
 	}
@@ -74,7 +73,7 @@ func (rs *RepoSelector) repoChanged() {
 			[]int{0, 1},
 			[]interface{}{repo.Name, repo.ID})
 		if err != nil {
-			log.Print("Unable to add row")
+			logger.Print("Unable to add row")
 			panic(err)
 		}
 		if config.PreferredRepo() == repo.ID {

@@ -11,7 +11,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gio"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rs/zerolog/log"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/settings"
 )
 
@@ -22,30 +22,18 @@ var resfs embed.FS
 
 // load basic resources o they are ready for the app
 func InitResources() {
-	if err := os.MkdirAll(settings.DataDir(), 0755); err != nil {
-		log.Error().Err(err)
-	}
-
 	f, err := resfs.Open("res.gresource")
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			log.Error().Err(err)
-		}
-	}()
+	defer f.Close()
 
 	rpath := filepath.Join(settings.DataDir(), "res.gresource")
 	out, err := os.Create(rpath)
 	if err != nil {
 		panic(fmt.Errorf("error creating res.gresource: %v", err))
 	}
-	defer func() {
-		if err = out.Close(); err != nil {
-			log.Error().Err(err)
-		}
-	}()
+	defer out.Close()
 
 	_, err = io.Copy(out, f)
 	if err != nil {
@@ -54,7 +42,8 @@ func InitResources() {
 
 	res, err := gio.LoadGResource(rpath)
 	if err != nil {
-		log.Error().Err(err)
+		logger.Error(err, "error loading resources")
+		panic(err)
 	}
 
 	gio.RegisterGResource(res)

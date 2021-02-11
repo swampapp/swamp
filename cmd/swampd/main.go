@@ -4,15 +4,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rs/zerolog"
 	"github.com/rubiojr/rapi"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/urfave/cli/v2"
 )
 
 var appCommands []*cli.Command
 var globalOptions = rapi.DefaultOptions
 var indexPath string
-var log = zerolog.New(os.Stderr).With().Timestamp().Logger()
 
 func main() {
 	var err error
@@ -21,9 +20,10 @@ func main() {
 		Commands: []*cli.Command{},
 		Version:  "v0.1.0",
 		Before: func(c *cli.Context) error {
-			log = log.Level(zerolog.InfoLevel)
 			if c.Bool("debug") {
-				log = log.Level(zerolog.DebugLevel)
+				logger.Init(logger.DebugLevel, "swampd")
+			} else {
+				logger.Init(logger.InfoLevel, "swampd")
 			}
 			return nil
 		},

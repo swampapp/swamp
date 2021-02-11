@@ -6,7 +6,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rs/zerolog/log"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/tags"
 	"github.com/swampapp/swamp/internal/ui/component"
 	"github.com/swampapp/swamp/internal/ui/util"
@@ -108,9 +108,9 @@ func (t *Tagger) saveTags() {
 	fmt.Println("saving tags ", tl)
 	err := tags.Save(t.fileID, tl)
 	if err != nil {
-		log.Error().Err(err).Msgf("error saving tags for %s", t.fileID)
+		logger.Errorf(err, "error saving tags for %s", t.fileID)
 	} else {
-		log.Info().Msgf("saved tags for %s", t.fileID)
+		logger.Infof("saved tags for %s", t.fileID)
 	}
 }
 
@@ -119,11 +119,11 @@ func (t *Tagger) populate() {
 
 	tl, err := tags.For(t.fileID)
 	if err != nil {
-		log.Error().Err(err).Msgf("error loading tags for %s", t.fileID)
+		logger.Errorf(err, "error loading tags for %s", t.fileID)
 		return
 	}
 	for _, tag := range tl {
-		log.Info().Msgf("populating with tag %s", tag.Name)
+		logger.Infof("populating with tag %s", tag.Name)
 		iter := t.listStore.Append()
 		t.listStore.Set(iter,
 			[]int{0},

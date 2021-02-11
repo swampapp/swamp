@@ -4,8 +4,8 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/downloader"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/ui/component"
 	"github.com/swampapp/swamp/internal/ui/reposelector"
@@ -77,7 +77,7 @@ func (a *AppMenu) addRowWithImage(img *gdk.Pixbuf, text string) {
 		[]interface{}{img, text, ""})
 
 	if err != nil {
-		log.Fatal().Err(err).Msg("unable to add row")
+		logger.Fatal(err, "unable to add row")
 	}
 }
 

@@ -3,8 +3,8 @@ package tags
 import (
 	"path/filepath"
 
-	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/index"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/settings"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/vmihailenco/msgpack/v5"
@@ -26,7 +26,7 @@ func For(fileID string) ([]Tag, error) {
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
-			log.Error().Err(err)
+			logger.Error(err, "")
 		}
 	}()
 
@@ -53,7 +53,7 @@ func All() ([]Tag, error) {
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
-			log.Error().Err(err)
+			logger.Error(err, "")
 		}
 	}()
 
@@ -85,7 +85,7 @@ func GetDocuments(tag string) ([]index.Document, error) {
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
-			log.Error().Err(err)
+			logger.Error(err, "")
 		}
 	}()
 
@@ -127,7 +127,7 @@ func Save(fileID string, tags []Tag) error {
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
-			log.Error().Err(err)
+			logger.Error(err, "")
 		}
 	}()
 

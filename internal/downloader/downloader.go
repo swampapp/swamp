@@ -14,9 +14,9 @@ import (
 	"time"
 
 	"github.com/Jeffail/tunny"
-	"github.com/rs/zerolog/log"
 
 	"github.com/swampapp/swamp/internal/index"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/settings"
 	"github.com/syndtr/goleveldb/leveldb"
 )
@@ -70,7 +70,7 @@ var dcache *leveldb.DB
 
 func init() {
 	if err := os.MkdirAll(settings.DownloadsDir(), 0755); err != nil {
-		log.Error().Err(err)
+		logger.Error(err, "")
 	}
 }
 
@@ -85,21 +85,21 @@ func Instance() *Downloader {
 			req := i.(downloadRequest)
 			err := instance.downloadFileID(req.fileID)
 			if err != nil {
-				log.Error().Err(err)
+				logger.Error(err, "")
 				return err
 			}
 
 			if req.exportDir != "" && req.name != "" {
 				err := Export(req.fileID, req.name, req.exportDir)
 				if err != nil {
-					log.Error().Err(err).Msgf("error exporting file '%s'", req.name)
+					logger.Errorf(err, "error exporting file '%s'", req.name)
 					return err
 				}
 			}
 
 			if req.open {
 				if err := Open(req.fileID); err != nil {
-					log.Error().Err(err)
+					logger.Error(err, "")
 				}
 			}
 
@@ -198,12 +198,12 @@ func (d *Downloader) DownloadAndExport(fileID, name, targetDir string) {
 func (d *Downloader) downloadFileID(fileID string) error {
 	doc, err := index.GetDocument(fileID)
 	if err != nil {
-		log.Error().Err(err).Msgf("file %s not found in index", fileID)
+		logger.Errorf(err, "file %s not found in index", fileID)
 		return err
 	}
 	dpath := PathFromID(fileID)
 	if _, err := os.Stat(dpath); err == nil {
-		log.Print("already downloaded ", fileID)
+		logger.Print("already downloaded ", fileID)
 		return fmt.Errorf("file %s already downloaded", fileID)
 	}
 
@@ -217,7 +217,7 @@ func (d *Downloader) downloadFileID(fileID string) error {
 	idx, err := index.Client()
 	if err != nil {
 		d.NotifyObservers(DownloadEvent{Type: EventError, FileID: fileID})
-		log.Error().Err(err).Msg("error initializing the index")
+		logger.Error(err, "error initializing the index")
 		return err
 	}
 
@@ -230,25 +230,25 @@ func (d *Downloader) downloadFileID(fileID string) error {
 	dest, err := os.Create(dpath + ".tmp")
 	if err != nil {
 		d.NotifyObservers(DownloadEvent{Type: EventError, FileID: fileID})
-		log.Error().Err(err).Msg("error creating download tmp file")
+		logger.Error(err, "error creating download tmp file")
 		return err
 	}
 	defer func() {
 		if err := dest.Close(); err != nil {
-			log.Error().Err(err)
+			logger.Error(err, "")
 		}
 	}()
 
-	log.Print("downloading ", fileID)
+	logger.Print("downloading ", fileID)
 	err = idx.Fetch(context.Background(), fileID, dest)
 	if err != nil {
 		d.NotifyObservers(DownloadEvent{Type: EventError, FileID: fileID})
-		log.Error().Err(err).Msg("error downloading file")
+		logger.Error(err, "error downloading file")
 		return err
 	}
 
 	if err := os.Rename(dest.Name(), dpath); err != nil {
-		log.Error().Err(err).Msgf("error moving file %s to %s", dest.Name(), dpath)
+		logger.Errorf(err, "error moving file %s to %s", dest.Name(), dpath)
 		return err
 	}
 
@@ -262,16 +262,16 @@ func (d *Downloader) downloadFileID(fileID string) error {
 
 	err = dcache.Put([]byte(fileID), buf.Bytes(), nil)
 	if err != nil {
-		log.Error().Err(err).Msg("error adding file to leveldb")
+		logger.Error(err, "error adding file to leveldb")
 		return err
 	}
 
 	if !d.removeInProgress(fileID) {
-		log.Error().Msg("failed to remove from in progress")
+		logger.Debug("failed to remove from in progress")
 	}
 
 	d.NotifyObservers(DownloadEvent{Type: EventFinished, FileID: fileID})
-	log.Print("downloaded ", fileID)
+	logger.Print("downloaded ", fileID)
 
 	return err
 }
@@ -300,11 +300,11 @@ func PathFromID(fileID string) string {
 
 func Open(fid string) error {
 	fpath := PathFromID(fid)
-	log.Print("Opening ", fpath)
+	logger.Print("Opening ", fpath)
 	cmd := exec.Command("/usr/bin/xdg-open", fpath)
 	err := cmd.Run()
 	if err != nil {
-		log.Print("error opening ", fpath)
+		logger.Print("error opening ", fpath)
 	}
 	return err
 }
@@ -333,7 +333,7 @@ func safeExportName(dest string) string {
 
 func Export(fid, name, target string) error {
 	fpath := PathFromID(fid)
-	log.Printf("Exporting %s to %s", fpath, target)
+	logger.Printf("Exporting %s to %s", fpath, target)
 	fi, err := os.Stat(fpath)
 	if err != nil {
 		return err
@@ -358,7 +358,7 @@ func Export(fid, name, target string) error {
 	}
 	defer func() {
 		if err := in.Close(); err != nil {
-			log.Error().Err(err)
+			logger.Error(err, "")
 		}
 	}()
 
@@ -369,14 +369,14 @@ func Export(fid, name, target string) error {
 	}
 	defer func() {
 		if err := out.Close(); err != nil {
-			log.Error().Err(err)
+			logger.Error(err, "")
 		}
 	}()
 
 	if _, err = io.Copy(out, in); err != nil {
 		return err
 	}
-	log.Printf("exported file %s as %s", fid, sn)
+	logger.Printf("exported file %s as %s", fid, sn)
 
 	return err
 }

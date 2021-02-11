@@ -9,7 +9,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rs/zerolog/log"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/tags"
 	"github.com/swampapp/swamp/internal/ui/component"
@@ -104,12 +104,12 @@ func secondButtonPressed(treeview *gtk.TreeView, btn *gdk.EventButton) {
 }
 
 func (t *TagList) updateFileList(query string) {
-	log.Print("taglist: searching for ", query)
+	logger.Print("taglist: searching for ", query)
 	t.listStore.Clear()
 
 	tags, err := tags.All()
 	if err != nil {
-		log.Error().Err(err).Msg("error listing tags")
+		logger.Error(err, "error listing tags")
 		return
 	}
 
@@ -130,7 +130,7 @@ func (t *TagList) addTagRow(name, color string) {
 		[]int{int(COLUMN_ICON), int(COLUMN_NAME), int(COLUMN_COLOR)},
 		[]interface{}{t.tagActionImage, name, color})
 	if err != nil {
-		log.Print("Unable to add row")
+		logger.Print("Unable to add row")
 		panic(err)
 	}
 }

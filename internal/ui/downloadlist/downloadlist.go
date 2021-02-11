@@ -8,8 +8,8 @@ import (
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/downloader"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/status"
 	"github.com/swampapp/swamp/internal/ui/component"
@@ -142,7 +142,7 @@ func menuItem(label string, image string) *gtk.MenuItem {
 }
 
 func (d *DownloadList) updateFileList(query string) {
-	log.Print("downloadlist: searching for ", query)
+	logger.Print("downloadlist: searching for ", query)
 	d.treeView.Clear()
 
 	// FIXME
@@ -248,6 +248,6 @@ func (d *DownloadList) listRowActivated(tree *gtk.TreeView, path *gtk.TreePath, 
 
 	err = downloader.Open(fid)
 	if err != nil {
-		log.Print("error opening ", fid)
+		logger.Print("error opening ", fid)
 	}
 }

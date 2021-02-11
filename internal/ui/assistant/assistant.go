@@ -6,9 +6,9 @@ import (
 
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rs/zerolog/log"
 	"github.com/rubiojr/rapi"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/swampapp/swamp/internal/ui/component"
 )
@@ -79,7 +79,7 @@ func New() *Assistant {
 			})
 			repo, err := rapi.OpenRepository(dopts)
 			if err != nil {
-				log.Error().Err(err).Msg("invalid restic credentials")
+				logger.Error(err, "invalid restic credentials")
 				glib.IdleAdd(func() {
 					lbl.SetText("⚠️ Invalid repository settings")
 				})
@@ -94,12 +94,12 @@ func New() *Assistant {
 					err := rs.Save()
 					if err != nil {
 						msg := "could not save credentials in the keyring"
-						log.Error().Err(err).Msg(msg)
+						logger.Error(err, msg)
 						lbl.SetText("⚠️ " + msg)
 						return
 					}
 					lbl.SetMarkup("👍 It worked! Click <b>Next</b> to finish the configuration.")
-					log.Print("credentials saved")
+					logger.Print("credentials saved")
 					a.SetPageComplete(page2, true)
 				})
 			}
@@ -135,7 +135,7 @@ func addRow(listStore *gtk.ListStore, text string) {
 		[]int{0},
 		[]interface{}{text})
 	if err != nil {
-		log.Print("Unable to add row")
+		logger.Print("Unable to add row")
 		panic(err)
 	}
 }
