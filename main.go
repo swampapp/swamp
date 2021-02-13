@@ -9,8 +9,7 @@ import (
 	"github.com/arl/statsviz"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/ui/mainwindow"
 )
@@ -18,6 +17,8 @@ import (
 var singleInstance sync.Once
 
 func main() {
+	logger.Init(logger.DebugLevel, "swamp")
+
 	for _, a := range os.Args {
 		if a == "-v" || a == "--version" {
 			fmt.Printf("Swamp v%s (%s)\n", APP_VERSION, GIT_SHA)
@@ -29,11 +30,10 @@ func main() {
 
 	statsviz.RegisterDefault()
 	go func() {
-		log.Print(http.ListenAndServe("localhost:6061", nil))
+		logger.Print(http.ListenAndServe("localhost:6061", nil))
 	}()
 
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Print("starting app")
+	logger.Print("starting app")
 
 	gtk.Init(nil)
 	app, _ := gtk.ApplicationNew("com.github.rubiojr.swamp", glib.APPLICATION_FLAGS_NONE)
@@ -50,7 +50,7 @@ func main() {
 func activate(app *gtk.Application) {
 	w, err := mainwindow.New(app)
 	if err != nil {
-		log.Printf("Failed to create main window: %+v", err)
+		logger.Printf("Failed to create main window: %+v", err)
 		panic(err)
 	}
 

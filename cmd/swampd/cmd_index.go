@@ -21,6 +21,7 @@ import (
 	"github.com/prometheus/procfs"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/indexer"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/urfave/cli/v2"
 )
 
@@ -77,12 +78,12 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 	f.Get("/procstats", func(c *fiber.Ctx) error {
 		p, err := procfs.NewProc(pid)
 		if err != nil {
-			log.Error().Err(err).Msgf("could not get process: %s", err)
+			logger.Error(err, "could not get process")
 			return err
 		}
 		pstats, err := p.Stat()
 		if err != nil {
-			log.Error().Err(err).Msgf("could not get process stat: %s", err)
+			logger.Error(err, "could not get process stat")
 			return err
 		}
 
@@ -114,12 +115,12 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 	})
 
 	f.Post("/kill", func(c *fiber.Ctx) error {
-		log.Debug().Msg("swampd was told to quit")
+		logger.Debug("swampd was told to quit")
 		cancel()
 		return c.SendString("shutting down")
 	})
 
-	log.Debug().Msgf("swampd socket path: %s", indexer.SocketPath())
+	logger.Debugf("swampd socket path: %s", indexer.SocketPath())
 	unixListener, err := net.Listen("unix", indexer.SocketPath())
 	if err != nil {
 		panic(err)
@@ -129,23 +130,21 @@ func socketServer(cancel context.CancelFunc, progress chan rindex.IndexStats) er
 	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 	go func(c chan os.Signal) {
 		sig := <-c
-		log.Printf("shutting down socket server: %v", sig)
+		logger.Debugf("shutting down socket server: %v", sig)
 		unixListener.Close()
 		os.Exit(0)
 	}(sigc)
 
 	err = f.Listener(unixListener)
 	if err != nil {
-		log.Fatal().Err(err).Msg("error setting custom UNIX listener")
+		logger.Fatal(err, "error setting custom UNIX listener")
 	}
 
-	log.Print("unix socket server starting")
+	logger.Print("unix socket server starting")
 	return f.Listen("")
 }
 
 func indexRepo(cli *cli.Context) error {
-	indexer.EnableDebugging(cli.Bool("debug"))
-
 	pid = os.Getpid()
 	_, err := os.Stat(indexer.SocketPath())
 	if err != nil {
@@ -156,16 +155,16 @@ func indexRepo(cli *cli.Context) error {
 		if indexer.IsRunning() {
 			return errors.New("swampd is already running")
 		}
-		log.Warn().Msgf("socket file found in %s, but looks stale, removing", indexer.SocketPath())
+		logger.Warnf("socket file found in %s, but looks stale, removing", indexer.SocketPath())
 		os.Remove(indexer.SocketPath())
 	}
 
 	if err := statsviz.RegisterDefault(); err == nil {
 		go func() {
-			log.Print(http.ListenAndServe("localhost:6060", nil))
+			logger.Print(http.ListenAndServe("localhost:6060", nil))
 		}()
 	} else {
-		log.Error().Err(err).Msg("error running statsviz")
+		logger.Error(err, "error running statsviz")
 	}
 
 	progress := make(chan rindex.IndexStats, 10)
@@ -182,7 +181,7 @@ func indexRepo(cli *cli.Context) error {
 
 	go func() {
 		if err := socketServer(cancel, progress); err != nil {
-			log.Error().Err(err).Msg("socket server returned an error")
+			logger.Error(err, "socket server returned an error")
 		}
 	}()
 
@@ -193,9 +192,9 @@ func indexRepo(cli *cli.Context) error {
 	stats, err := idx.Index(ctx, idxOpts, progress)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
-			log.Fatal().Err(err).Msg("indexing process aborted with an unknown error")
+			logger.Fatal(err, "indexing process aborted with an unknown error")
 		}
-		log.Print("indexing stopped")
+		logger.Print("indexing stopped")
 	}
 
 	if cli.Bool("monitor") {
@@ -207,7 +206,7 @@ func indexRepo(cli *cli.Context) error {
 			int(time.Since(tStart).Seconds()),
 		)
 	} else {
-		log.Info().Msgf(
+		logger.Infof(
 			"%d indexed, %d already present. %d new snapshots. Took %d seconds.\n",
 			stats.IndexedFiles,
 			stats.AlreadyIndexed,
@@ -229,7 +228,7 @@ func progressMonitor(logErrors bool, progress chan rindex.IndexStats) {
 	for {
 		p, err := indexer.Stats()
 		if err != nil {
-			log.Error().Err(err).Msgf("error reading stats")
+			logger.Error(err, "error reading stats")
 			continue
 		}
 		printStats(logErrors, p, s)

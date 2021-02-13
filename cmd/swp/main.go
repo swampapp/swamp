@@ -9,10 +9,10 @@ import (
 
 	"github.com/blugelabs/bluge"
 	"github.com/manifoldco/promptui"
-	"github.com/rs/zerolog"
 	"github.com/rubiojr/rapi"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/queryparser"
 	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/urfave/cli/v2"
@@ -24,8 +24,6 @@ var blugeConf bluge.Config
 var indexPath string
 
 func main() {
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-
 	app := &cli.App{
 		Name:     "swp",
 		Commands: []*cli.Command{},
@@ -214,7 +212,9 @@ func doSearch(c *cli.Context) error {
 	}
 
 	if c.Bool("debug") {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		logger.Init(logger.DebugLevel, "swp")
+	} else {
+		logger.Init(logger.InfoLevel, "swp")
 	}
 
 	q := c.Args().Get(0)

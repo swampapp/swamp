@@ -9,9 +9,9 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rs/zerolog/log"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/indexer"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/ui/component"
 )
@@ -44,17 +44,15 @@ func New() *Indexer {
 	i.indexButton.Connect("clicked", func() {
 		lbl, _ := i.indexButton.GetLabel()
 		if lbl == "Start Indexing" {
-			log.Print("manual indexing request")
+			logger.Print("manual indexing request")
 			indexer.Daemon().Start()
 		} else {
-			log.Print("manual indexing stop")
+			logger.Print("manual indexing stop")
 			indexer.Daemon().Stop()
 		}
 	})
 
 	i.indexAnimation, _ = i.GladeWidget("indexingFlask").(*gtk.Image)
-
-	indexer.EnableDebugging(true)
 
 	indexer.Daemon().OnStop(func() {
 		i.cancelFunc()
@@ -68,7 +66,7 @@ func New() *Indexer {
 }
 
 func (i *Indexer) stop() {
-	log.Print("indexerui: stop")
+	logger.Print("indexerui: stop")
 	i.statusProgress.SetFraction(1)
 	i.indexButton.SetLabel("Start Indexing")
 	resources.UpdateImageFromResource(i.indexAnimation, "indexing-done")
@@ -87,7 +85,7 @@ func (i *Indexer) updateTopLabel(pstats indexer.ProcStats, start time.Time, stat
 }
 
 func (i *Indexer) start() {
-	log.Print("indexerui: start")
+	logger.Print("indexerui: start")
 	i.ctx, i.cancelFunc = context.WithCancel(context.Background())
 	sTime := time.Now()
 
@@ -116,7 +114,7 @@ func (i *Indexer) start() {
 
 				pstats, err := indexer.GetProcStats()
 				if err != nil {
-					log.Error().Err(err).Msg("error fetching swampd procstats")
+					logger.Error(err, "error fetching swampd procstats")
 				}
 				if pstats.RSS == 0 {
 					continue
@@ -124,7 +122,7 @@ func (i *Indexer) start() {
 
 				stats, err := indexer.Stats()
 				if err != nil {
-					log.Error().Err(err).Msg("indexerui: error retrieving indexer stats")
+					logger.Error(err, "indexerui: error retrieving indexer stats")
 				}
 				percentage := float64(0)
 				if stats.CurrentSnapshotTotalFiles > 0 {

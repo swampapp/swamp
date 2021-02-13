@@ -12,9 +12,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rs/zerolog"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/swampapp/swamp/internal/settings"
 )
@@ -33,22 +33,9 @@ var clientOnce, once sync.Once
 var instance *Indexer
 var socketClient *http.Client
 var socketPath = filepath.Join(settings.DataDir(), "indexing.sock")
-var log = zerolog.New(os.Stderr).With().Timestamp().Logger()
 
 func New() *Indexer {
-	i := &Indexer{}
-
-	EnableDebugging(true)
-
-	return i
-}
-
-func EnableDebugging(d bool) {
-	if d {
-		log = log.Level(zerolog.DebugLevel)
-	} else {
-		log = log.Level(zerolog.InfoLevel)
-	}
+	return &Indexer{}
 }
 
 func (i *Indexer) toggleState() {
@@ -57,11 +44,11 @@ func (i *Indexer) toggleState() {
 
 	if IsRunning() && !i.running {
 		i.running = true
-		log.Print("indexer: running, notify start")
+		logger.Print("indexer: running, notify start")
 		i.notifyStart()
 	} else if !IsRunning() && i.running {
 		i.running = false
-		log.Print("indexer: stopped, notify stop")
+		logger.Print("indexer: stopped, notify stop")
 		i.notifyStop()
 	}
 }
@@ -70,11 +57,11 @@ func Daemon() *Indexer {
 	once.Do(func() {
 		instance = New()
 		go func() {
-			log.Print("indexer: starting swampd for the first time")
+			logger.Print("indexer: starting swampd for the first time")
 			instance.Start()
 			ticker := time.NewTicker(60 * time.Minute)
 			for range ticker.C {
-				log.Print("indexer: trying to start swampd")
+				logger.Print("indexer: trying to start swampd")
 				instance.Start()
 			}
 		}()
@@ -92,11 +79,11 @@ func Daemon() *Indexer {
 func (i *Indexer) Start() {
 	go func() {
 		if IsRunning() {
-			log.Print("indexer: already running, skiping")
+			logger.Print("indexer: already running, skiping")
 			return
 		}
 
-		log.Print("indexer: STARTED the indexing goroutine")
+		logger.Print("indexer: STARTED the indexing goroutine")
 		prepo := config.PreferredRepo()
 		rs := resticsettings.New(prepo)
 
@@ -104,26 +91,26 @@ func (i *Indexer) Start() {
 
 		for {
 			if !resticsettings.FirstBoot() {
-				log.Print("indexer: no first boot")
+				logger.Print("indexer: no first boot")
 				break
 			}
 			time.Sleep(10 * time.Second)
-			log.Print("indexer: waiting for first boot")
+			logger.Print("indexer: waiting for first boot")
 		}
 
 		defer func() {
 			i.notifyStop()
-			log.Print("indexer: stopped swampd")
+			logger.Print("indexer: stopped swampd")
 		}()
 
-		log.Print("indexer: starting swampd")
+		logger.Print("indexer: starting swampd")
 		bin, err := exec.LookPath("swampd")
 		if err != nil {
-			log.Error().Err(err).Msg("error finding swampd executable path")
+			logger.Error(err, "error finding swampd executable path")
 			return
 		}
 
-		log.Printf("indexer: %s %s %s %s", bin, "--index-path", settings.IndexPath(), "index")
+		logger.Printf("indexer: %s %s %s %s", bin, "--index-path", settings.IndexPath(), "index")
 		cmd := exec.Command(bin, "--debug", "--index-path", settings.IndexPath(), "index")
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -134,7 +121,7 @@ func (i *Indexer) Start() {
 		cmd.Env = append(cmd.Env, "AWS_SECRET_ACCESS_KEY="+rs.Var2)
 		err = cmd.Run()
 		if err != nil {
-			log.Error().Err(err).Msgf("indexer: swampd error")
+			logger.Error(err, "indexer: swampd error")
 		}
 	}()
 }
@@ -149,7 +136,7 @@ func (i *Indexer) Stop() error {
 
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
-		log.Error().Err(err).Msg("unhandled error reading body")
+		logger.Error(err, "unhandled error reading body")
 		if !IsRunning() {
 			i.notifyStop()
 		}
@@ -167,7 +154,7 @@ func IsRunning() bool {
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Error().Err(err).Msg("unhandled error reading body")
+		logger.Error(err, "unhandled error reading body")
 	}
 	return string(b) == "pong"
 }
@@ -218,7 +205,7 @@ func SocketPath() string {
 func Stats() (rindex.IndexStats, error) {
 	resp, err := Client().Get("http://localhost/stats")
 	if err != nil {
-		log.Print("error fetching stats")
+		logger.Print("error fetching stats")
 		return rindex.IndexStats{}, err
 	}
 	defer resp.Body.Close()
@@ -237,7 +224,7 @@ func Stats() (rindex.IndexStats, error) {
 func Pid() (int, error) {
 	resp, err := Client().Get("http://localhost/pid")
 	if err != nil {
-		log.Print("error fetching stats")
+		logger.Print("error fetching stats")
 		return -1, err
 	}
 	defer resp.Body.Close()
@@ -262,7 +249,7 @@ func GetProcStats() (ProcStats, error) {
 	var procStats ProcStats
 	resp, err := Client().Get("http://localhost/procstats")
 	if err != nil {
-		log.Print("error fetching stats")
+		logger.Print("error fetching stats")
 		return procStats, err
 	}
 	defer resp.Body.Close()

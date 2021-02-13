@@ -7,9 +7,9 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/downloader"
 	indexerd "github.com/swampapp/swamp/internal/indexer"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/swampapp/swamp/internal/settings"
@@ -157,7 +157,7 @@ func New(a *gtk.Application) (*MainWindow, error) {
 }
 
 func (w *MainWindow) SetMainPanel(t string) {
-	log.Print("changing main pane to ", t)
+	logger.Print("changing main pane to ", t)
 
 	child, _ := w.paned.GetChild2()
 	if child != nil {

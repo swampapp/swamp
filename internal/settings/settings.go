@@ -4,8 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/logger"
 )
 
 var shareDir = filepath.Join(os.Getenv("HOME"), ".local/share/com.github.swampapp")
@@ -21,7 +21,8 @@ func SetDarkMode(mode bool) {
 
 func init() {
 	if err := os.MkdirAll(config.RepositoriesDir(), 0755); err != nil {
-		log.Error().Err(err)
+		logger.Error(err, "error creating repositories directory")
+		panic(err)
 	}
 }
 

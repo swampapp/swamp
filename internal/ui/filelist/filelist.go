@@ -9,10 +9,10 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/rs/zerolog/log"
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/downloader"
 	"github.com/swampapp/swamp/internal/index"
+	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/queryparser"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/status"
@@ -209,7 +209,7 @@ func (f *FileList) isStreamable(tree *gtk.TreeView, x, y float64) bool {
 
 	fid, err := f.treeView.FileAt(int(y))
 	if err != nil {
-		log.Error().Err(err).Msgf("error retrieving file at row %d", int(y))
+		logger.Errorf(err, "error retrieving file at row %d", int(y))
 		return false
 	}
 
@@ -373,7 +373,7 @@ func (f *FileList) searchTags(query string) bool {
 				tname = match[i]
 			}
 		}
-		log.Printf("searching for tag %s", tname)
+		logger.Printf("searching for tag %s", tname)
 		docs, _ := tags.GetDocuments(tname)
 		for _, doc := range docs {
 			if ok, _ := downloader.Instance().WasDownloaded(doc.ID); ok {
@@ -391,7 +391,7 @@ func (f *FileList) searchTags(query string) bool {
 func (f *FileList) searchIndex(query string) {
 	idx, err := index.Client()
 	if err != nil {
-		log.Err(err).Msg("error updating file list")
+		logger.Error(err, "error updating file list")
 		return
 	}
 
@@ -401,7 +401,7 @@ func (f *FileList) searchIndex(query string) {
 	size := 0.0
 	count := 0
 	q, err := queryparser.ParseQuery(query)
-	log.Debug().Msgf("searching for %s", q)
+	logger.Debugf("searching for %s", q)
 	if err != nil {
 		status.Set("⚠️ invalid query: " + err.Error())
 		return

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/rs/zerolog/log"
+	"github.com/swampapp/swamp/internal/logger"
 	"gopkg.in/yaml.v2"
 )
 
@@ -40,7 +40,7 @@ func AddRepository(name, id string, preferred bool) {
 	}
 
 	if err := os.MkdirAll(filepath.Join(RepositoriesDir(), id), 0755); err != nil {
-		log.Error().Err(err)
+		logger.Errorf(err, "error creating repository %s directory", id)
 	}
 }
 
@@ -50,7 +50,7 @@ func RepositoriesDir() string {
 
 func init() {
 	if err := os.MkdirAll(Dir(), 0755); err != nil {
-		log.Error().Err(err)
+		logger.Error(err, "error creating configuration directory")
 	}
 
 	if _, err := os.Stat(Path()); err == nil {
@@ -79,34 +79,34 @@ func Repositories() []Repository {
 func Save() {
 	d, err := yaml.Marshal(&instance)
 	if err != nil {
-		log.Fatal().Err(err).Msgf("error: %v", err)
+		logger.Fatal(err, "error marshalling configuration")
 	}
 
 	f, err := os.Create(Path())
 	if err != nil {
-		log.Error().Err(err).Msg("error creating config file")
+		logger.Error(err, "error creating config file")
 	}
 
 	_, err = f.Write(d)
 	if err != nil {
-		log.Error().Err(err).Msg("error writing config file")
+		logger.Error(err, "error writing config file")
 	}
 }
 
 func Load() {
 	f, err := ioutil.ReadFile(Path())
 	if err != nil {
-		log.Fatal().Err(err).Msg("error reading config")
+		logger.Fatal(err, "error reading config")
 	}
 
 	err = yaml.Unmarshal([]byte(f), &instance)
 	if err != nil {
-		log.Fatal().Err(err).Msg("invalid config file format")
+		logger.Fatal(err, "invalid config file format")
 	}
 
 	for _, repo := range instance.Repositories {
 		if err := os.MkdirAll(filepath.Join(RepositoriesDir(), repo.ID), 0755); err != nil {
-			log.Error().Err(err)
+			logger.Errorf(err, "error creaating repository %s directory", repo.ID)
 		}
 	}
 }
@@ -132,7 +132,7 @@ func SetPreferredRepo(id string) {
 	instance.PreferredRepo = id
 	preferredChanged(id)
 
-	log.Debug().Msgf("setting preferred repo to %s", id)
+	logger.Debugf("setting preferred repo to %s", id)
 	Save()
 }
 
