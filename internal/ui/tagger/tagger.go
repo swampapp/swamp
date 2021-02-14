@@ -1,8 +1,6 @@
 package tagger
 
 import (
-	"fmt"
-
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
@@ -105,7 +103,6 @@ func (t *Tagger) saveTags() {
 		tl = append(tl, tag)
 		return false
 	})
-	fmt.Println("saving tags ", tl)
 	err := tags.Save(t.fileID, tl)
 	if err != nil {
 		logger.Errorf(err, "error saving tags for %s", t.fileID)
