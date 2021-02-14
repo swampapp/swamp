@@ -1,10 +1,9 @@
 [Desktop Entry]
-Name=Swamp
-Exec=swamp
 Type=Application
+TryExec=swamp
+Exec=swamp
 Icon=swampapp
-Categories=Application
-StartupNotify=true
 Terminal=false
-Encoding=UTF-8
-Keywords=restic;backup;
+Name=Swamp
+Comment=Restic backup indexer and browser
+StartupWMClass=Swamp
