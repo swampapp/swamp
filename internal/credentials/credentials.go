@@ -41,6 +41,7 @@ func New(repoID string) *Credentials {
 func (s *Credentials) key() string {
 	return "com.github.swampapp." + s.ID
 }
+
 func FirstBoot() bool {
 	return config.PreferredRepo() == ""
 }
