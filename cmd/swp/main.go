@@ -247,13 +247,17 @@ func doSearch(c *cli.Context) error {
 
 	var indexPath, repoName string
 	if repoName = c.String("repo"); repoName != "" {
-		rn := config.RepoDirFor(repoName)
+		rn := repoDirFor(repoName)
 		if rn == "" {
 			return fmt.Errorf("no repository found with name '%s'", repoName)
 		}
-		indexPath = filepath.Join(config.RepoDirFor(repoName), "index", "swamp.bluge")
+		indexPath = filepath.Join(rn, "index", "swamp.bluge")
 	} else {
-		indexPath = filepath.Join(config.PreferredRepoDir(), "index", "swamp.bluge")
+		pr := config.PreferredRepo()
+		if pr == "" {
+			panic("preferred repo not set")
+		}
+		indexPath = filepath.Join(paths.RepositoriesDir(), pr, "index", "swamp.bluge")
 	}
 
 	if _, err := os.Stat(indexPath); os.IsNotExist(err) {
@@ -280,4 +284,14 @@ func doSearch(c *cli.Context) error {
 	fmt.Printf("Results: %d\n", count)
 
 	return err
+}
+
+func repoDirFor(name string) string {
+	for _, r := range config.Repositories() {
+		if r.Name == name {
+			return filepath.Join(paths.RepositoriesDir(), r.ID)
+		}
+	}
+
+	return ""
 }

@@ -53,16 +53,6 @@ func Repositories() []Repository {
 	return instance.Repositories
 }
 
-func RepoDirFor(name string) string {
-	for _, r := range Repositories() {
-		if r.Name == name {
-			return filepath.Join(paths.RepositoriesDir(), r.ID)
-		}
-	}
-
-	return ""
-}
-
 func Save() {
 	d, err := yaml.Marshal(&instance)
 	if err != nil {
@@ -133,32 +123,4 @@ func IsDarkMode() bool {
 
 func SetDarkMode(mode bool) {
 	darkMode = mode
-}
-
-func CurrentRepoDir() string {
-	if PreferredRepo() == "" {
-		return ""
-	}
-
-	return filepath.Join(paths.RepositoriesDir(), PreferredRepo())
-}
-
-func PreferredRepoDir() string {
-	return filepath.Join(paths.RepositoriesDir(), PreferredRepo())
-}
-
-func CurrentIndexDir() string {
-	if CurrentRepoDir() == "" {
-		return ""
-	}
-
-	return filepath.Join(CurrentRepoDir(), "index")
-}
-
-func CurrentIndexPath() string {
-	if CurrentIndexDir() == "" {
-		return ""
-	}
-
-	return filepath.Join(CurrentIndexDir(), "swamp.bluge")
 }

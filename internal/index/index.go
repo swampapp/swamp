@@ -3,12 +3,14 @@ package index
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	"github.com/blugelabs/bluge"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/logger"
+	"github.com/swampapp/swamp/internal/paths"
 )
 
 type Document struct {
@@ -53,8 +55,12 @@ func GetDocument(id string) (Document, error) {
 }
 
 func NeedsIndexing(id string) (bool, error) {
+	if config.PreferredRepo() == "" {
+		return false, nil
+	}
+
 	rs := credentials.New(id)
-	idx, err := rindex.NewOffline(config.CurrentIndexPath(), rs.Repository, rs.Password)
+	idx, err := rindex.NewOffline(currentIndexPath(), rs.Repository, rs.Password)
 	if err != nil {
 		return false, err
 	}
@@ -75,5 +81,12 @@ func Client() (rindex.Indexer, error) {
 
 	k := credentials.New(config.PreferredRepo())
 
-	return rindex.NewOffline(config.CurrentIndexPath(), k.Repository, k.Password)
+	return rindex.NewOffline(currentIndexPath(), k.Repository, k.Password)
+}
+
+func currentIndexPath() string {
+	pr := config.PreferredRepo()
+	rd := paths.RepositoriesDir()
+
+	return filepath.Join(rd, pr, "index", "swamp.bluge")
 }

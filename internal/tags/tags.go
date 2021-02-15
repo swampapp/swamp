@@ -6,6 +6,7 @@ import (
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/index"
 	"github.com/swampapp/swamp/internal/logger"
+	"github.com/swampapp/swamp/internal/paths"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -16,7 +17,12 @@ type Tag struct {
 }
 
 func dbPath() string {
-	return filepath.Join(config.CurrentRepoDir(), "tags.db")
+	pr := config.PreferredRepo()
+	if pr == "" {
+		panic("preferred repo not set")
+	}
+
+	return filepath.Join(paths.RepositoriesDir(), pr, "tags.db")
 }
 
 func For(fileID string) ([]Tag, error) {

@@ -3,6 +3,7 @@ package indexer
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -110,8 +111,9 @@ func (i *Indexer) Start() {
 			return
 		}
 
-		logger.Printf("indexer: %s %s %s %s", bin, "--index-path", config.CurrentIndexPath(), "index")
-		cmd := exec.Command(bin, "--debug", "--index-path", config.CurrentIndexPath(), "index")
+		args := []string{"--debug", "--index-path", currentIndexPath(), "index"}
+		log.Print("swampd command: ", args)
+		cmd := exec.Command(bin, args...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Env = os.Environ()
@@ -262,4 +264,11 @@ func GetProcStats() (ProcStats, error) {
 	err = json.Unmarshal(b, &procStats)
 
 	return procStats, err
+}
+
+func currentIndexPath() string {
+	pr := config.PreferredRepo()
+	rd := paths.RepositoriesDir()
+
+	return filepath.Join(rd, pr, "index", "swamp.bluge")
 }
