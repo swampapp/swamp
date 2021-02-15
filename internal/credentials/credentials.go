@@ -1,13 +1,11 @@
-package keyring
+package credentials
 
 import (
-	"os"
-
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/zalando/go-keyring"
 )
 
-type Keyring struct {
+type Credentials struct {
 	Repository string
 	Password   string
 	Var1       string
@@ -15,12 +13,12 @@ type Keyring struct {
 	ID         string
 }
 
-func New(repoID string) *Keyring {
+func New(repoID string) *Credentials {
 	if len(repoID) != 64 {
 		panic("invalid repo ID")
 	}
 
-	instance := &Keyring{ID: repoID}
+	instance := &Credentials{ID: repoID}
 	uri, err := keyring.Get(instance.key(), "repository")
 	if err == nil {
 		instance.Repository = uri
@@ -40,14 +38,14 @@ func New(repoID string) *Keyring {
 	return instance
 }
 
-func (s *Keyring) key() string {
+func (s *Credentials) key() string {
 	return "com.github.swampapp." + s.ID
 }
 func FirstBoot() bool {
 	return config.PreferredRepo() == ""
 }
 
-func (s *Keyring) Delete() error {
+func (s *Credentials) Delete() error {
 	err := keyring.Delete(s.key(), "repository")
 	if err != nil {
 		return err
@@ -71,7 +69,7 @@ func (s *Keyring) Delete() error {
 	return nil
 }
 
-func (s *Keyring) Save() error {
+func (s *Credentials) Save() error {
 	err := keyring.Set(s.key(), "repository", s.Repository)
 	if err != nil {
 		return err
@@ -93,18 +91,4 @@ func (s *Keyring) Save() error {
 	}
 
 	return nil
-}
-
-func (s *Keyring) ExportEnv() {
-	os.Setenv("RESTIC_REPOSITORY", s.Repository)
-	os.Setenv("RESTIC_PASSWORD", s.Password)
-	os.Setenv("AWS_ACCESS_KEY", s.Var1)
-	os.Setenv("AWS_SECRET_ACCESS_KEY", s.Var2)
-}
-
-func ResetEnv() {
-	os.Unsetenv("RESTIC_REPOSITORY")
-	os.Unsetenv("RESTIC_PASSWORD")
-	os.Unsetenv("AWS_ACCESS_KEY")
-	os.Unsetenv("AWS_SECRET_ACCESS_KEY")
 }

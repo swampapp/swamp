@@ -12,7 +12,7 @@ import (
 	"github.com/rubiojr/rapi"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
-	"github.com/swampapp/swamp/internal/keyring"
+	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/paths"
 	"github.com/swampapp/swamp/internal/queryparser"
@@ -186,7 +186,7 @@ func addRepo(c *cli.Context) error {
 	fmt.Println("✅")
 
 	repoID := repo.Config().ID
-	rs := keyring.New(repoID)
+	rs := credentials.New(repoID)
 	rs.Password = pass
 	rs.Repository = uri
 	if key != "" {
@@ -243,7 +243,7 @@ func doSearch(c *cli.Context) error {
 		}
 	}
 
-	rs := keyring.New(config.PreferredRepo())
+	rs := credentials.New(config.PreferredRepo())
 
 	var indexPath, repoName string
 	if repoName = c.String("repo"); repoName != "" {
@@ -260,8 +260,7 @@ func doSearch(c *cli.Context) error {
 		return fmt.Errorf("repository '%s' needs to be indexed first. Open swamp to do it", repoName)
 	}
 
-	rs.ExportEnv()
-	idx, err := rindex.NewOffline(indexPath, globalOptions.Repo, globalOptions.Password)
+	idx, err := rindex.NewOffline(indexPath, rs.Repository, rs.Password)
 	if err != nil {
 		return err
 	}

@@ -8,9 +8,9 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/pkg/errors"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/downloader"
 	indexerd "github.com/swampapp/swamp/internal/indexer"
-	"github.com/swampapp/swamp/internal/keyring"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/status"
@@ -121,7 +121,7 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	pane.Add2(mw.fileList)
 	pane.SetPosition(230)
 
-	if keyring.FirstBoot() {
+	if credentials.FirstBoot() {
 		a := assistant.New()
 		a.ShowAll()
 		a.WhenDone(func() {

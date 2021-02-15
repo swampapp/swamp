@@ -14,7 +14,7 @@ import (
 
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
-	"github.com/swampapp/swamp/internal/keyring"
+	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/paths"
 )
@@ -85,12 +85,12 @@ func (i *Indexer) Start() {
 
 		logger.Print("indexer: STARTED the indexing goroutine")
 		prepo := config.PreferredRepo()
-		rs := keyring.New(prepo)
+		rs := credentials.New(prepo)
 
 		i.notifyStart()
 
 		for {
-			if !keyring.FirstBoot() {
+			if !credentials.FirstBoot() {
 				logger.Print("indexer: no first boot")
 				break
 			}

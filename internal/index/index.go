@@ -7,7 +7,7 @@ import (
 	"github.com/blugelabs/bluge"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
-	"github.com/swampapp/swamp/internal/keyring"
+	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/logger"
 )
 
@@ -53,7 +53,7 @@ func GetDocument(id string) (Document, error) {
 }
 
 func NeedsIndexing(id string) (bool, error) {
-	rs := keyring.New(id)
+	rs := credentials.New(id)
 	idx, err := rindex.NewOffline(config.CurrentIndexPath(), rs.Repository, rs.Password)
 	if err != nil {
 		return false, err
@@ -73,8 +73,7 @@ func Client() (rindex.Indexer, error) {
 		return indexer, fmt.Errorf("no preferred repository currently set")
 	}
 
-	k := keyring.New(config.PreferredRepo())
-	//	k.ExportEnv()
+	k := credentials.New(config.PreferredRepo())
 
 	return rindex.NewOffline(config.CurrentIndexPath(), k.Repository, k.Password)
 }
