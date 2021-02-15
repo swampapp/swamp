@@ -90,7 +90,7 @@ func ImageForDoc(name string) *gdk.Pixbuf {
 func Pixbuf(path string) *gdk.Pixbuf {
 	// FIXME: hack, how do we detect a dark theme reliably?
 	accent := "light"
-	if config.IsDarkMode() {
+	if config.Get().IsDarkMode() {
 		accent = "dark"
 	}
 	rpath := fmt.Sprintf("/images/%s/%s", accent, path)
@@ -103,7 +103,7 @@ func Pixbuf(path string) *gdk.Pixbuf {
 
 func UpdateImageFromResource(img *gtk.Image, path string) {
 	accent := "light"
-	if config.IsDarkMode() {
+	if config.Get().IsDarkMode() {
 		accent = "dark"
 	}
 	rpath := fmt.Sprintf("/images/%s/%s", accent, path)
@@ -112,7 +112,7 @@ func UpdateImageFromResource(img *gtk.Image, path string) {
 
 func Image(path string) *gtk.Image {
 	accent := "light"
-	if config.IsDarkMode() {
+	if config.Get().IsDarkMode() {
 		accent = "dark"
 	}
 	rpath := fmt.Sprintf("/images/%s/%s", accent, path)

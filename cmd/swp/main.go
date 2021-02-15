@@ -195,8 +195,12 @@ func addRepo(c *cli.Context) error {
 	}
 	rs.Save()
 
+	config, err := config.Init()
+	if err != nil {
+		return err
+	}
+
 	config.AddRepository(name, repoID, false)
-	config.Save()
 	if c.Bool("preferred") {
 		config.SetPreferredRepo(repoID)
 	}
@@ -243,6 +247,10 @@ func doSearch(c *cli.Context) error {
 		}
 	}
 
+	config, err := config.Init()
+	if err != nil {
+		return err
+	}
 	rs := credentials.New(config.PreferredRepo())
 
 	var indexPath, repoName string
@@ -287,7 +295,7 @@ func doSearch(c *cli.Context) error {
 }
 
 func repoDirFor(name string) string {
-	for _, r := range config.Repositories() {
+	for _, r := range config.Get().Repositories() {
 		if r.Name == name {
 			return filepath.Join(paths.RepositoriesDir(), r.ID)
 		}

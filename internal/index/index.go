@@ -55,7 +55,7 @@ func GetDocument(id string) (Document, error) {
 }
 
 func NeedsIndexing(id string) (bool, error) {
-	if config.PreferredRepo() == "" {
+	if config.Get().PreferredRepo() == "" {
 		return false, nil
 	}
 
@@ -75,17 +75,17 @@ func NeedsIndexing(id string) (bool, error) {
 
 func Client() (rindex.Indexer, error) {
 	var indexer rindex.Indexer
-	if config.PreferredRepo() == "" {
+	if config.Get().PreferredRepo() == "" {
 		return indexer, fmt.Errorf("no preferred repository currently set")
 	}
 
-	k := credentials.New(config.PreferredRepo())
+	k := credentials.New(config.Get().PreferredRepo())
 
 	return rindex.NewOffline(currentIndexPath(), k.Repository, k.Password)
 }
 
 func currentIndexPath() string {
-	pr := config.PreferredRepo()
+	pr := config.Get().PreferredRepo()
 	rd := paths.RepositoriesDir()
 
 	return filepath.Join(rd, pr, "index", "swamp.bluge")

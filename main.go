@@ -9,6 +9,7 @@ import (
 	"github.com/arl/statsviz"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/ui/mainwindow"
@@ -24,6 +25,10 @@ func main() {
 			fmt.Printf("Swamp v%s (%s)\n", APP_VERSION, GIT_SHA)
 			os.Exit(0)
 		}
+	}
+	_, err := config.Init()
+	if err != nil {
+		panic(fmt.Errorf("error initializing configuration: %w", err))
 	}
 
 	resources.InitResources()

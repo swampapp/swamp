@@ -96,3 +96,7 @@ func Fatal(err error, msg string) {
 func Warnf(msg string, fmt ...interface{}) {
 	logger.Warn().Msgf(msg, fmt...)
 }
+
+func Warn(msg string) {
+	logger.Warn().Msgf(msg)
+}

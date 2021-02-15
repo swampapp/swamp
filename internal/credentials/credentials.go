@@ -43,7 +43,11 @@ func (s *Credentials) key() string {
 }
 
 func FirstBoot() bool {
-	return config.PreferredRepo() == ""
+	if !config.Exists() {
+		return true
+	}
+
+	return len(config.Get().Repositories()) == 0
 }
 
 func (s *Credentials) Delete() error {

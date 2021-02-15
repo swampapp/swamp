@@ -79,13 +79,18 @@ func Daemon() *Indexer {
 
 func (i *Indexer) Start() {
 	go func() {
+		if !config.Exists() {
+			logger.Warn("indexer: configuration does not exist")
+			return
+		}
+
 		if IsRunning() {
 			logger.Print("indexer: already running, skiping")
 			return
 		}
 
 		logger.Print("indexer: STARTED the indexing goroutine")
-		prepo := config.PreferredRepo()
+		prepo := config.Get().PreferredRepo()
 		rs := credentials.New(prepo)
 
 		i.notifyStart()
@@ -267,7 +272,7 @@ func GetProcStats() (ProcStats, error) {
 }
 
 func currentIndexPath() string {
-	pr := config.PreferredRepo()
+	pr := config.Get().PreferredRepo()
 	rd := paths.RepositoriesDir()
 
 	return filepath.Join(rd, pr, "index", "swamp.bluge")

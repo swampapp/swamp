@@ -60,7 +60,7 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	rgba := color.Floats()
 	luminace := (0.2126*rgba[0] + 0.7152*rgba[1] + 0.0722*rgba[2])
 	if luminace > 0.5 {
-		config.SetDarkMode(true)
+		config.Get().SetDarkMode(true)
 	}
 
 	mw = &MainWindow{

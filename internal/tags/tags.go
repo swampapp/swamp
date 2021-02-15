@@ -17,7 +17,7 @@ type Tag struct {
 }
 
 func dbPath() string {
-	pr := config.PreferredRepo()
+	pr := config.Get().PreferredRepo()
 	if pr == "" {
 		panic("preferred repo not set")
 	}

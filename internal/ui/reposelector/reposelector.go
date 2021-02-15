@@ -43,7 +43,7 @@ func New() *RepoSelector {
 		}
 		value, _ := rs.store.GetValue(iter, 1)
 		repo, _ := value.GetString()
-		config.SetPreferredRepo(repo)
+		config.Get().SetPreferredRepo(repo)
 
 		return true
 	})
@@ -53,7 +53,7 @@ func New() *RepoSelector {
 
 func (rs *RepoSelector) populate() {
 	rs.store.Clear()
-	for _, repo := range config.Repositories() {
+	for _, repo := range config.Get().Repositories() {
 		iter := rs.store.Prepend()
 		err := rs.store.Set(iter,
 			[]int{0, 1},
@@ -67,7 +67,7 @@ func (rs *RepoSelector) populate() {
 
 func (rs *RepoSelector) repoChanged() {
 	rs.store.Clear()
-	for _, repo := range config.Repositories() {
+	for _, repo := range config.Get().Repositories() {
 		iter := rs.store.Prepend()
 		err := rs.store.Set(iter,
 			[]int{0, 1},
@@ -76,7 +76,7 @@ func (rs *RepoSelector) repoChanged() {
 			logger.Print("Unable to add row")
 			panic(err)
 		}
-		if config.PreferredRepo() == repo.ID {
+		if config.Get().PreferredRepo() == repo.ID {
 			rs.SetActiveIter(iter)
 		}
 	}

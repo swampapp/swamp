@@ -111,7 +111,7 @@ func New() *Assistant {
 	})
 
 	a.Connect("apply", func(widget *gtk.Assistant) {
-		config.AddRepository(repoName, repoID, true)
+		config.Get().AddRepository(repoName, repoID, true)
 		widget.Hide()
 		if callback != nil {
 			callback()
