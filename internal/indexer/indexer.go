@@ -14,9 +14,9 @@ import (
 
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/keyring"
 	"github.com/swampapp/swamp/internal/logger"
-	"github.com/swampapp/swamp/internal/resticsettings"
-	"github.com/swampapp/swamp/internal/settings"
+	"github.com/swampapp/swamp/internal/paths"
 )
 
 type Indexer struct {
@@ -32,7 +32,7 @@ type OnStartCb func()
 var clientOnce, once sync.Once
 var instance *Indexer
 var socketClient *http.Client
-var socketPath = filepath.Join(settings.DataDir(), "indexing.sock")
+var socketPath = filepath.Join(paths.DataDir(), "indexing.sock")
 
 func New() *Indexer {
 	return &Indexer{}
@@ -85,12 +85,12 @@ func (i *Indexer) Start() {
 
 		logger.Print("indexer: STARTED the indexing goroutine")
 		prepo := config.PreferredRepo()
-		rs := resticsettings.New(prepo)
+		rs := keyring.New(prepo)
 
 		i.notifyStart()
 
 		for {
-			if !resticsettings.FirstBoot() {
+			if !keyring.FirstBoot() {
 				logger.Print("indexer: no first boot")
 				break
 			}
@@ -110,8 +110,8 @@ func (i *Indexer) Start() {
 			return
 		}
 
-		logger.Printf("indexer: %s %s %s %s", bin, "--index-path", settings.IndexPath(), "index")
-		cmd := exec.Command(bin, "--debug", "--index-path", settings.IndexPath(), "index")
+		logger.Printf("indexer: %s %s %s %s", bin, "--index-path", config.CurrentIndexPath(), "index")
+		cmd := exec.Command(bin, "--debug", "--index-path", config.CurrentIndexPath(), "index")
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Env = os.Environ()

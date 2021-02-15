@@ -17,7 +17,7 @@ import (
 
 	"github.com/swampapp/swamp/internal/index"
 	"github.com/swampapp/swamp/internal/logger"
-	"github.com/swampapp/swamp/internal/settings"
+	"github.com/swampapp/swamp/internal/paths"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -68,16 +68,10 @@ type downloadRequest struct {
 
 var dcache *leveldb.DB
 
-func init() {
-	if err := os.MkdirAll(settings.DownloadsDir(), 0755); err != nil {
-		logger.Error(err, "")
-	}
-}
-
 func Instance() *Downloader {
 	once.Do(func() {
 		var err error
-		dcache, err = leveldb.OpenFile(filepath.Join(settings.DownloadsDir(), "index"), nil)
+		dcache, err = leveldb.OpenFile(filepath.Join(paths.DownloadsDir(), "index"), nil)
 		if err != nil {
 			panic(err)
 		}
@@ -295,7 +289,7 @@ func (d *Downloader) removeInProgress(fid string) bool {
 
 // PathFromID returns the full path to a downloaded file
 func PathFromID(fileID string) string {
-	return filepath.Join(settings.DownloadsDir(), fileID[:2], fileID)
+	return filepath.Join(paths.DownloadsDir(), fileID[:2], fileID)
 }
 
 func Open(fid string) error {

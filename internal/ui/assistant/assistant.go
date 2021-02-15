@@ -8,8 +8,8 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/rubiojr/rapi"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/keyring"
 	"github.com/swampapp/swamp/internal/logger"
-	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/swampapp/swamp/internal/ui/component"
 )
 
@@ -47,7 +47,7 @@ func New() *Assistant {
 		}
 	})
 
-	var rs *resticsettings.Settings
+	var rs *keyring.Keyring
 	page2 := a.GladeWidget("assistantPage2").(*gtk.Box)
 	btn := a.GladeWidget("testSettingsBTN").(*gtk.Button)
 	var repoID, repoName, ruri, rpass, var1, var2 string
@@ -86,7 +86,7 @@ func New() *Assistant {
 			} else {
 				glib.IdleAdd(func() {
 					repoID = repo.Config().ID
-					rs = resticsettings.New(repoID)
+					rs = keyring.New(repoID)
 					rs.Password = rpass
 					rs.Repository = ruri
 					rs.Var1 = var1

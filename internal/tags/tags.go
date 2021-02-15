@@ -3,9 +3,9 @@ package tags
 import (
 	"path/filepath"
 
+	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/index"
 	"github.com/swampapp/swamp/internal/logger"
-	"github.com/swampapp/swamp/internal/settings"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -16,7 +16,7 @@ type Tag struct {
 }
 
 func dbPath() string {
-	return filepath.Join(settings.RepoDir(), "tags.db")
+	return filepath.Join(config.CurrentRepoDir(), "tags.db")
 }
 
 func For(fileID string) ([]Tag, error) {

@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/swampapp/swamp/internal/logger"
+	"github.com/swampapp/swamp/internal/paths"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,8 +29,6 @@ var prListeners []prListener
 
 var instance = &Config{}
 
-var shareDir = filepath.Join(os.Getenv("HOME"), ".local/share/com.github.swampapp")
-
 func AddRepository(name, id string, preferred bool) {
 	m.Lock()
 	instance.Repositories = append(instance.Repositories, Repository{ID: id, Name: name})
@@ -39,41 +38,29 @@ func AddRepository(name, id string, preferred bool) {
 		SetPreferredRepo(id)
 	}
 
-	if err := os.MkdirAll(filepath.Join(RepositoriesDir(), id), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(paths.RepositoriesDir(), id), 0755); err != nil {
 		logger.Errorf(err, "error creating repository %s directory", id)
 	}
 }
 
-func RepositoriesDir() string {
-	return filepath.Join(shareDir, "repositories")
-}
-
 func init() {
-	if err := os.MkdirAll(Dir(), 0755); err != nil {
-		logger.Error(err, "error creating configuration directory")
-	}
-
-	if _, err := os.Stat(Path()); err == nil {
+	if _, err := os.Stat(paths.ConfigPath()); err == nil {
 		Load()
 	}
 }
 
-func PreferredRepoDir() string {
-	return filepath.Join(RepositoriesDir(), PreferredRepo())
+func Repositories() []Repository {
+	return instance.Repositories
 }
 
 func RepoDirFor(name string) string {
 	for _, r := range Repositories() {
 		if r.Name == name {
-			return filepath.Join(RepositoriesDir(), r.ID)
+			return filepath.Join(paths.RepositoriesDir(), r.ID)
 		}
 	}
 
 	return ""
-}
-
-func Repositories() []Repository {
-	return instance.Repositories
 }
 
 func Save() {
@@ -82,7 +69,7 @@ func Save() {
 		logger.Fatal(err, "error marshalling configuration")
 	}
 
-	f, err := os.Create(Path())
+	f, err := os.Create(paths.ConfigPath())
 	if err != nil {
 		logger.Error(err, "error creating config file")
 	}
@@ -94,7 +81,7 @@ func Save() {
 }
 
 func Load() {
-	f, err := ioutil.ReadFile(Path())
+	f, err := ioutil.ReadFile(paths.ConfigPath())
 	if err != nil {
 		logger.Fatal(err, "error reading config")
 	}
@@ -105,18 +92,10 @@ func Load() {
 	}
 
 	for _, repo := range instance.Repositories {
-		if err := os.MkdirAll(filepath.Join(RepositoriesDir(), repo.ID), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Join(paths.RepositoriesDir(), repo.ID), 0755); err != nil {
 			logger.Errorf(err, "error creaating repository %s directory", repo.ID)
 		}
 	}
-}
-
-func Dir() string {
-	return filepath.Join(os.Getenv("HOME"), ".config/com.github.swampapp")
-}
-
-func Path() string {
-	return filepath.Join(os.Getenv("HOME"), ".config/com.github.swampapp", "config.yaml")
 }
 
 func PreferredRepo() string {
@@ -144,4 +123,42 @@ func preferredChanged(id string) {
 	for _, l := range prListeners {
 		l(id)
 	}
+}
+
+var darkMode = false
+
+func IsDarkMode() bool {
+	return darkMode
+}
+
+func SetDarkMode(mode bool) {
+	darkMode = mode
+}
+
+func CurrentRepoDir() string {
+	if PreferredRepo() == "" {
+		return ""
+	}
+
+	return filepath.Join(paths.RepositoriesDir(), PreferredRepo())
+}
+
+func PreferredRepoDir() string {
+	return filepath.Join(paths.RepositoriesDir(), PreferredRepo())
+}
+
+func CurrentIndexDir() string {
+	if CurrentRepoDir() == "" {
+		return ""
+	}
+
+	return filepath.Join(CurrentRepoDir(), "index")
+}
+
+func CurrentIndexPath() string {
+	if CurrentIndexDir() == "" {
+		return ""
+	}
+
+	return filepath.Join(CurrentIndexDir(), "swamp.bluge")
 }

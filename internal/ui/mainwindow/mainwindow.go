@@ -7,12 +7,12 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/pkg/errors"
+	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/downloader"
 	indexerd "github.com/swampapp/swamp/internal/indexer"
+	"github.com/swampapp/swamp/internal/keyring"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
-	"github.com/swampapp/swamp/internal/resticsettings"
-	"github.com/swampapp/swamp/internal/settings"
 	"github.com/swampapp/swamp/internal/status"
 	"github.com/swampapp/swamp/internal/streamer"
 	"github.com/swampapp/swamp/internal/ui/appmenu"
@@ -60,7 +60,7 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	rgba := color.Floats()
 	luminace := (0.2126*rgba[0] + 0.7152*rgba[1] + 0.0722*rgba[2])
 	if luminace > 0.5 {
-		settings.SetDarkMode(true)
+		config.SetDarkMode(true)
 	}
 
 	mw = &MainWindow{
@@ -121,7 +121,7 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	pane.Add2(mw.fileList)
 	pane.SetPosition(230)
 
-	if resticsettings.FirstBoot() {
+	if keyring.FirstBoot() {
 		a := assistant.New()
 		a.ShowAll()
 		a.WhenDone(func() {
