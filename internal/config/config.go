@@ -37,10 +37,6 @@ func AddRepository(name, id string, preferred bool) {
 	if preferred {
 		SetPreferredRepo(id)
 	}
-
-	if err := os.MkdirAll(filepath.Join(paths.RepositoriesDir(), id), 0755); err != nil {
-		logger.Errorf(err, "error creating repository %s directory", id)
-	}
 }
 
 func init() {
