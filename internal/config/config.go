@@ -111,6 +111,8 @@ func Load() (Config, error) {
 		return c, err
 	}
 
+	c.loaded = true
+
 	return c, nil
 }
 
