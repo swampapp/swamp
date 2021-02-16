@@ -12,6 +12,7 @@ import (
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/logger"
+	"github.com/swampapp/swamp/internal/paths"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/ui/assistant"
 	"github.com/swampapp/swamp/internal/ui/mainwindow"
@@ -27,7 +28,12 @@ func main() {
 		}
 	}
 
-	_, err := config.Init()
+	err := paths.Initialize()
+	if err != nil {
+		panic(fmt.Errorf("error initializing paths: %w", err))
+	}
+
+	_, err = config.Init()
 	if err != nil {
 		panic(fmt.Errorf("error initializing configuration: %w", err))
 	}

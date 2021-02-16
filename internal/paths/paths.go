@@ -10,7 +10,7 @@ import (
 
 var shareDir = filepath.Join(os.Getenv("HOME"), ".local/share/com.github.swampapp")
 
-func init() {
+func Initialize() error {
 	var err error
 
 	if runtime.GOOS != "linux" {
@@ -29,9 +29,7 @@ func init() {
 		logger.Error(err, "error creating downloads directory")
 	}
 
-	if err != nil {
-		panic(err)
-	}
+	return err
 }
 
 func DownloadsDir() string {
