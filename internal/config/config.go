@@ -15,7 +15,6 @@ type Config struct {
 	repositories  []Repository
 	preferredRepo string
 	darkMode      bool
-	m             sync.Mutex
 }
 
 var prListeners []prListener
@@ -31,16 +30,14 @@ var instance Config
 var once sync.Once
 
 func (c Config) AddRepository(name, id string, preferred bool) {
-	c.m.Lock()
-	defer c.m.Unlock()
-
 	c.repositories = append(c.repositories, Repository{ID: id, Name: name})
 
+	// Prevent double save
 	if preferred {
 		c.SetPreferredRepo(id)
+	} else {
+		c.Save()
 	}
-
-	c.Save()
 }
 
 func (c Config) Repositories() []Repository {
@@ -87,6 +84,7 @@ func Init() (Config, error) {
 		}
 
 		instance = Config{}
+		instance.loaded = true
 	})
 
 	return instance, err
@@ -121,9 +119,6 @@ func (c Config) PreferredRepo() string {
 }
 
 func (c Config) SetPreferredRepo(id string) {
-	c.m.Lock()
-	defer c.m.Unlock()
-
 	if c.preferredRepo == id {
 		return
 	}
