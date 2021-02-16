@@ -47,7 +47,7 @@ func FirstBoot() bool {
 		return true
 	}
 
-	return len(config.Get().Repositories()) == 0
+	return len(config.Get().ListRepositories()) == 0
 }
 
 func (s *Credentials) Delete() error {

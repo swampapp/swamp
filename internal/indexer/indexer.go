@@ -3,7 +3,6 @@ package indexer
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -117,7 +116,7 @@ func (i *Indexer) Start() {
 		}
 
 		args := []string{"--debug", "--index-path", currentIndexPath(), "index"}
-		log.Print("swampd command: ", args)
+		logger.Print("swampd command: ", args)
 		cmd := exec.Command(bin, args...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr

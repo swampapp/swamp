@@ -8,7 +8,6 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/pkg/errors"
 	"github.com/swampapp/swamp/internal/config"
-	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/downloader"
 	indexerd "github.com/swampapp/swamp/internal/indexer"
 	"github.com/swampapp/swamp/internal/logger"
@@ -16,7 +15,6 @@ import (
 	"github.com/swampapp/swamp/internal/status"
 	"github.com/swampapp/swamp/internal/streamer"
 	"github.com/swampapp/swamp/internal/ui/appmenu"
-	"github.com/swampapp/swamp/internal/ui/assistant"
 	"github.com/swampapp/swamp/internal/ui/component"
 	"github.com/swampapp/swamp/internal/ui/downloadlist"
 	"github.com/swampapp/swamp/internal/ui/filelist"
@@ -46,9 +44,6 @@ func Instance() *MainWindow {
 }
 
 func New(a *gtk.Application) (*MainWindow, error) {
-	screen, _ := gdk.ScreenGetDefault()
-	gtk.AddProviderForScreen(screen, resources.CSS(), gtk.STYLE_PROVIDER_PRIORITY_USER)
-
 	w, err := gtk.ApplicationWindowNew(a)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create window")
@@ -120,16 +115,6 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	// File List
 	pane.Add2(mw.fileList)
 	pane.SetPosition(230)
-
-	if credentials.FirstBoot() {
-		a := assistant.New()
-		a.ShowAll()
-		a.WhenDone(func() {
-			mw.ShowAll()
-		})
-	} else {
-		mw.ShowAll()
-	}
 
 	taglist.TagSelectedEvent("taglist", func(tag string) {
 		mw.searchText = "tag:" + tag

@@ -295,7 +295,7 @@ func doSearch(c *cli.Context) error {
 }
 
 func repoDirFor(name string) string {
-	for _, r := range config.Get().Repositories() {
+	for _, r := range config.Get().ListRepositories() {
 		if r.Name == name {
 			return filepath.Join(paths.RepositoriesDir(), r.ID)
 		}

@@ -11,10 +11,10 @@ import (
 )
 
 type Config struct {
-	loaded        bool
-	repositories  []Repository
-	preferredRepo string
-	darkMode      bool
+	loaded          bool
+	Repositories    []Repository
+	PreferredRepoID string
+	DarkMode        bool
 }
 
 var prListeners []prListener
@@ -26,11 +26,11 @@ type Repository struct {
 
 type prListener func(string)
 
-var instance Config
+var instance *Config
 var once sync.Once
 
-func (c Config) AddRepository(name, id string, preferred bool) {
-	c.repositories = append(c.repositories, Repository{ID: id, Name: name})
+func (c *Config) AddRepository(name, id string, preferred bool) {
+	c.Repositories = append(c.Repositories, Repository{ID: id, Name: name})
 
 	// Prevent double save
 	if preferred {
@@ -40,12 +40,12 @@ func (c Config) AddRepository(name, id string, preferred bool) {
 	}
 }
 
-func (c Config) Repositories() []Repository {
-	return c.repositories
+func (c *Config) ListRepositories() []Repository {
+	return c.Repositories
 }
 
-func (c Config) Save() error {
-	d, err := yaml.Marshal(&c)
+func (c *Config) Save() error {
+	d, err := yaml.Marshal(c)
 	if err != nil {
 		logger.Fatal(err, "error marshalling configuration")
 		return err
@@ -56,17 +56,17 @@ func (c Config) Save() error {
 		logger.Error(err, "error creating config file")
 		return err
 	}
+	defer f.Close()
 
 	_, err = f.Write(d)
 	if err != nil {
 		logger.Error(err, "error writing config file")
-		return err
 	}
 
-	return nil
+	return err
 }
 
-func Get() Config {
+func Get() *Config {
 	if !instance.loaded {
 		panic("configuration needs to be initialized first")
 	}
@@ -74,7 +74,7 @@ func Get() Config {
 	return instance
 }
 
-func Init() (Config, error) {
+func Init() (*Config, error) {
 	var err error
 
 	once.Do(func() {
@@ -83,15 +83,15 @@ func Init() (Config, error) {
 			return
 		}
 
-		instance = Config{}
+		instance = &Config{}
 		instance.loaded = true
 	})
 
 	return instance, err
 }
 
-func Load() (Config, error) {
-	c := Config{}
+func Load() (*Config, error) {
+	c := &Config{}
 
 	if _, err := os.Stat(paths.ConfigPath()); err != nil {
 		return c, err
@@ -114,16 +114,16 @@ func Load() (Config, error) {
 	return c, nil
 }
 
-func (c Config) PreferredRepo() string {
-	return c.preferredRepo
+func (c *Config) PreferredRepo() string {
+	return c.PreferredRepoID
 }
 
-func (c Config) SetPreferredRepo(id string) {
-	if c.preferredRepo == id {
+func (c *Config) SetPreferredRepo(id string) {
+	if c.PreferredRepoID == id {
 		return
 	}
 
-	c.preferredRepo = id
+	c.PreferredRepoID = id
 
 	preferredChanged(id)
 
@@ -141,12 +141,12 @@ func preferredChanged(id string) {
 	}
 }
 
-func (c Config) IsDarkMode() bool {
-	return c.darkMode
+func (c *Config) IsDarkMode() bool {
+	return c.DarkMode
 }
 
-func (c Config) SetDarkMode(mode bool) {
-	c.darkMode = mode
+func (c *Config) SetDarkMode(mode bool) {
+	c.DarkMode = mode
 
 	c.Save()
 }

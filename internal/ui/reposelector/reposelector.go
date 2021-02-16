@@ -53,7 +53,7 @@ func New() *RepoSelector {
 
 func (rs *RepoSelector) populate() {
 	rs.store.Clear()
-	for _, repo := range config.Get().Repositories() {
+	for _, repo := range config.Get().ListRepositories() {
 		iter := rs.store.Prepend()
 		err := rs.store.Set(iter,
 			[]int{0, 1},
@@ -67,7 +67,7 @@ func (rs *RepoSelector) populate() {
 
 func (rs *RepoSelector) repoChanged() {
 	rs.store.Clear()
-	for _, repo := range config.Get().Repositories() {
+	for _, repo := range config.Get().ListRepositories() {
 		iter := rs.store.Prepend()
 		err := rs.store.Set(iter,
 			[]int{0, 1},
