@@ -3,137 +3,132 @@ package config
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/swampapp/swamp/internal/logger"
+	"github.com/swampapp/swamp/internal/paths"
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-	Repositories  []Repository
-	PreferredRepo string
+	loaded          bool
+	Repositories    []Repository
+	PreferredRepoID string
+	DarkMode        bool
 }
+
+var prListeners []prListener
 
 type Repository struct {
 	Name string
 	ID   string
 }
 
-var m sync.Mutex
-
 type prListener func(string)
 
-var prListeners []prListener
+var instance *Config
+var once sync.Once
 
-var instance = &Config{}
+func (c *Config) AddRepository(name, id string, preferred bool) {
+	c.Repositories = append(c.Repositories, Repository{ID: id, Name: name})
 
-var shareDir = filepath.Join(os.Getenv("HOME"), ".local/share/com.github.swampapp")
-
-func AddRepository(name, id string, preferred bool) {
-	m.Lock()
-	instance.Repositories = append(instance.Repositories, Repository{ID: id, Name: name})
-	m.Unlock()
-
+	// Prevent double save
 	if preferred {
-		SetPreferredRepo(id)
-	}
-
-	if err := os.MkdirAll(filepath.Join(RepositoriesDir(), id), 0755); err != nil {
-		logger.Errorf(err, "error creating repository %s directory", id)
+		c.SetPreferredRepo(id)
+	} else {
+		c.Save()
 	}
 }
 
-func RepositoriesDir() string {
-	return filepath.Join(shareDir, "repositories")
+func (c *Config) ListRepositories() []Repository {
+	return c.Repositories
 }
 
-func init() {
-	if err := os.MkdirAll(Dir(), 0755); err != nil {
-		logger.Error(err, "error creating configuration directory")
-	}
-
-	if _, err := os.Stat(Path()); err == nil {
-		Load()
-	}
-}
-
-func PreferredRepoDir() string {
-	return filepath.Join(RepositoriesDir(), PreferredRepo())
-}
-
-func RepoDirFor(name string) string {
-	for _, r := range Repositories() {
-		if r.Name == name {
-			return filepath.Join(RepositoriesDir(), r.ID)
-		}
-	}
-
-	return ""
-}
-
-func Repositories() []Repository {
-	return instance.Repositories
-}
-
-func Save() {
-	d, err := yaml.Marshal(&instance)
+func (c *Config) Save() error {
+	d, err := yaml.Marshal(c)
 	if err != nil {
 		logger.Fatal(err, "error marshalling configuration")
+		return err
 	}
 
-	f, err := os.Create(Path())
+	f, err := os.Create(paths.ConfigPath())
 	if err != nil {
 		logger.Error(err, "error creating config file")
+		return err
 	}
+	defer f.Close()
 
 	_, err = f.Write(d)
 	if err != nil {
 		logger.Error(err, "error writing config file")
 	}
+
+	return err
 }
 
-func Load() {
-	f, err := ioutil.ReadFile(Path())
+func Get() *Config {
+	if !instance.loaded {
+		panic("configuration needs to be initialized first")
+	}
+
+	return instance
+}
+
+func Init() (*Config, error) {
+	var err error
+
+	once.Do(func() {
+		if Exists() {
+			instance, err = Load()
+			return
+		}
+
+		instance = &Config{}
+		instance.loaded = true
+	})
+
+	return instance, err
+}
+
+func Load() (*Config, error) {
+	c := &Config{}
+
+	if _, err := os.Stat(paths.ConfigPath()); err != nil {
+		return c, err
+	}
+
+	f, err := ioutil.ReadFile(paths.ConfigPath())
 	if err != nil {
 		logger.Fatal(err, "error reading config")
+		return c, err
 	}
 
-	err = yaml.Unmarshal([]byte(f), &instance)
+	err = yaml.Unmarshal([]byte(f), &c)
 	if err != nil {
 		logger.Fatal(err, "invalid config file format")
+		return c, err
 	}
 
-	for _, repo := range instance.Repositories {
-		if err := os.MkdirAll(filepath.Join(RepositoriesDir(), repo.ID), 0755); err != nil {
-			logger.Errorf(err, "error creaating repository %s directory", repo.ID)
-		}
-	}
+	c.loaded = true
+
+	return c, nil
 }
 
-func Dir() string {
-	return filepath.Join(os.Getenv("HOME"), ".config/com.github.swampapp")
+func (c *Config) PreferredRepo() string {
+	return c.PreferredRepoID
 }
 
-func Path() string {
-	return filepath.Join(os.Getenv("HOME"), ".config/com.github.swampapp", "config.yaml")
-}
-
-func PreferredRepo() string {
-	return instance.PreferredRepo
-}
-
-func SetPreferredRepo(id string) {
-	m.Lock()
-	defer m.Unlock()
-	if instance.PreferredRepo == id {
+func (c *Config) SetPreferredRepo(id string) {
+	if c.PreferredRepoID == id {
 		return
 	}
-	instance.PreferredRepo = id
+
+	c.PreferredRepoID = id
+
 	preferredChanged(id)
 
 	logger.Debugf("setting preferred repo to %s", id)
-	Save()
+	c.Save()
 }
 
 func AddPreferredRepoListener(l func(string)) {
@@ -144,4 +139,24 @@ func preferredChanged(id string) {
 	for _, l := range prListeners {
 		l(id)
 	}
+}
+
+func (c *Config) IsDarkMode() bool {
+	return c.DarkMode
+}
+
+func (c *Config) SetDarkMode(mode bool) {
+	c.DarkMode = mode
+
+	c.Save()
+}
+
+func Exists() bool {
+	_, err := os.Stat(paths.ConfigPath())
+
+	if err != nil && !os.IsNotExist(err) {
+		panic(err)
+	}
+
+	return !os.IsNotExist(err)
 }

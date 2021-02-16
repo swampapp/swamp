@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/swampapp/swamp/internal/resticsettings"
+	"github.com/swampapp/swamp/internal/credentials"
 )
 
 func main() {
@@ -15,6 +15,6 @@ func main() {
 	repo := os.Args[1]
 	fmt.Println(repo)
 	os.Exit(0)
-	settings := resticsettings.New(repo)
+	settings := credentials.New(repo)
 	settings.Delete()
 }

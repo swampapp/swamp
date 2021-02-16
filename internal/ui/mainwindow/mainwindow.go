@@ -7,16 +7,14 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/pkg/errors"
+	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/downloader"
 	indexerd "github.com/swampapp/swamp/internal/indexer"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
-	"github.com/swampapp/swamp/internal/resticsettings"
-	"github.com/swampapp/swamp/internal/settings"
 	"github.com/swampapp/swamp/internal/status"
 	"github.com/swampapp/swamp/internal/streamer"
 	"github.com/swampapp/swamp/internal/ui/appmenu"
-	"github.com/swampapp/swamp/internal/ui/assistant"
 	"github.com/swampapp/swamp/internal/ui/component"
 	"github.com/swampapp/swamp/internal/ui/downloadlist"
 	"github.com/swampapp/swamp/internal/ui/filelist"
@@ -39,16 +37,7 @@ type MainWindow struct {
 	indexerUI      *indexer.Indexer
 }
 
-var mw *MainWindow
-
-func Instance() *MainWindow {
-	return mw
-}
-
 func New(a *gtk.Application) (*MainWindow, error) {
-	screen, _ := gdk.ScreenGetDefault()
-	gtk.AddProviderForScreen(screen, resources.CSS(), gtk.STYLE_PROVIDER_PRIORITY_USER)
-
 	w, err := gtk.ApplicationWindowNew(a)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create window")
@@ -60,10 +49,10 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	rgba := color.Floats()
 	luminace := (0.2126*rgba[0] + 0.7152*rgba[1] + 0.0722*rgba[2])
 	if luminace > 0.5 {
-		settings.SetDarkMode(true)
+		config.Get().SetDarkMode(true)
 	}
 
-	mw = &MainWindow{
+	mw := &MainWindow{
 		Component:         component.New("/ui/mainwindow"),
 		ApplicationWindow: *w,
 		appMenu:           appmenu.New(),
@@ -120,16 +109,6 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	// File List
 	pane.Add2(mw.fileList)
 	pane.SetPosition(230)
-
-	if resticsettings.FirstBoot() {
-		a := assistant.New()
-		a.ShowAll()
-		a.WhenDone(func() {
-			mw.ShowAll()
-		})
-	} else {
-		mw.ShowAll()
-	}
 
 	taglist.TagSelectedEvent("taglist", func(tag string) {
 		mw.searchText = "tag:" + tag

@@ -14,9 +14,9 @@ import (
 
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/logger"
-	"github.com/swampapp/swamp/internal/resticsettings"
-	"github.com/swampapp/swamp/internal/settings"
+	"github.com/swampapp/swamp/internal/paths"
 )
 
 type Indexer struct {
@@ -32,7 +32,7 @@ type OnStartCb func()
 var clientOnce, once sync.Once
 var instance *Indexer
 var socketClient *http.Client
-var socketPath = filepath.Join(settings.DataDir(), "indexing.sock")
+var socketPath = filepath.Join(paths.DataDir(), "indexing.sock")
 
 func New() *Indexer {
 	return &Indexer{}
@@ -78,19 +78,24 @@ func Daemon() *Indexer {
 
 func (i *Indexer) Start() {
 	go func() {
+		if !config.Exists() {
+			logger.Warn("indexer: configuration does not exist")
+			return
+		}
+
 		if IsRunning() {
 			logger.Print("indexer: already running, skiping")
 			return
 		}
 
 		logger.Print("indexer: STARTED the indexing goroutine")
-		prepo := config.PreferredRepo()
-		rs := resticsettings.New(prepo)
+		prepo := config.Get().PreferredRepo()
+		rs := credentials.New(prepo)
 
 		i.notifyStart()
 
 		for {
-			if !resticsettings.FirstBoot() {
+			if !credentials.FirstBoot() {
 				logger.Print("indexer: no first boot")
 				break
 			}
@@ -110,8 +115,9 @@ func (i *Indexer) Start() {
 			return
 		}
 
-		logger.Printf("indexer: %s %s %s %s", bin, "--index-path", settings.IndexPath(), "index")
-		cmd := exec.Command(bin, "--debug", "--index-path", settings.IndexPath(), "index")
+		args := []string{"--debug", "--index-path", currentIndexPath(), "index"}
+		logger.Print("swampd command: ", args)
+		cmd := exec.Command(bin, args...)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Env = os.Environ()
@@ -262,4 +268,11 @@ func GetProcStats() (ProcStats, error) {
 	err = json.Unmarshal(b, &procStats)
 
 	return procStats, err
+}
+
+func currentIndexPath() string {
+	pr := config.Get().PreferredRepo()
+	rd := paths.RepositoriesDir()
+
+	return filepath.Join(rd, pr, "index", "swamp.bluge")
 }

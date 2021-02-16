@@ -3,13 +3,14 @@ package index
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	"github.com/blugelabs/bluge"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/logger"
-	"github.com/swampapp/swamp/internal/resticsettings"
-	"github.com/swampapp/swamp/internal/settings"
+	"github.com/swampapp/swamp/internal/paths"
 )
 
 type Document struct {
@@ -54,8 +55,12 @@ func GetDocument(id string) (Document, error) {
 }
 
 func NeedsIndexing(id string) (bool, error) {
-	rs := resticsettings.New(id)
-	idx, err := rindex.NewOffline(settings.IndexPath(), rs.Repository, rs.Password)
+	if config.Get().PreferredRepo() == "" {
+		return false, nil
+	}
+
+	rs := credentials.New(id)
+	idx, err := rindex.NewOffline(currentIndexPath(), rs.Repository, rs.Password)
 	if err != nil {
 		return false, err
 	}
@@ -69,8 +74,19 @@ func NeedsIndexing(id string) (bool, error) {
 }
 
 func Client() (rindex.Indexer, error) {
-	if config.PreferredRepo() != "" {
-		resticsettings.New(config.PreferredRepo()).ExportEnv()
+	var indexer rindex.Indexer
+	if config.Get().PreferredRepo() == "" {
+		return indexer, fmt.Errorf("no preferred repository currently set")
 	}
-	return rindex.NewOffline(settings.IndexPath(), settings.Repository(), settings.Password())
+
+	k := credentials.New(config.Get().PreferredRepo())
+
+	return rindex.NewOffline(currentIndexPath(), k.Repository, k.Password)
+}
+
+func currentIndexPath() string {
+	pr := config.Get().PreferredRepo()
+	rd := paths.RepositoriesDir()
+
+	return filepath.Join(rd, pr, "index", "swamp.bluge")
 }

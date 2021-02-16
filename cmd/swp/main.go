@@ -12,9 +12,10 @@ import (
 	"github.com/rubiojr/rapi"
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
+	"github.com/swampapp/swamp/internal/credentials"
 	"github.com/swampapp/swamp/internal/logger"
+	"github.com/swampapp/swamp/internal/paths"
 	"github.com/swampapp/swamp/internal/queryparser"
-	"github.com/swampapp/swamp/internal/resticsettings"
 	"github.com/urfave/cli/v2"
 )
 
@@ -185,7 +186,7 @@ func addRepo(c *cli.Context) error {
 	fmt.Println("✅")
 
 	repoID := repo.Config().ID
-	rs := resticsettings.New(repoID)
+	rs := credentials.New(repoID)
 	rs.Password = pass
 	rs.Repository = uri
 	if key != "" {
@@ -194,8 +195,12 @@ func addRepo(c *cli.Context) error {
 	}
 	rs.Save()
 
+	config, err := config.Init()
+	if err != nil {
+		return err
+	}
+
 	config.AddRepository(name, repoID, false)
-	config.Save()
 	if c.Bool("preferred") {
 		config.SetPreferredRepo(repoID)
 	}
@@ -207,7 +212,7 @@ func addRepo(c *cli.Context) error {
 }
 
 func doSearch(c *cli.Context) error {
-	if _, err := os.Stat(config.RepositoriesDir()); os.IsNotExist(err) {
+	if _, err := os.Stat(paths.RepositoriesDir()); os.IsNotExist(err) {
 		return fmt.Errorf("swamp CLI doesn't currently support indexing repositories.\nRun the swamp app first.")
 	}
 
@@ -242,25 +247,32 @@ func doSearch(c *cli.Context) error {
 		}
 	}
 
-	rs := resticsettings.New(config.PreferredRepo())
+	config, err := config.Init()
+	if err != nil {
+		return err
+	}
+	rs := credentials.New(config.PreferredRepo())
 
 	var indexPath, repoName string
 	if repoName = c.String("repo"); repoName != "" {
-		rn := config.RepoDirFor(repoName)
+		rn := repoDirFor(repoName)
 		if rn == "" {
 			return fmt.Errorf("no repository found with name '%s'", repoName)
 		}
-		indexPath = filepath.Join(config.RepoDirFor(repoName), "index", "swamp.bluge")
+		indexPath = filepath.Join(rn, "index", "swamp.bluge")
 	} else {
-		indexPath = filepath.Join(config.PreferredRepoDir(), "index", "swamp.bluge")
+		pr := config.PreferredRepo()
+		if pr == "" {
+			panic("preferred repo not set")
+		}
+		indexPath = filepath.Join(paths.RepositoriesDir(), pr, "index", "swamp.bluge")
 	}
 
 	if _, err := os.Stat(indexPath); os.IsNotExist(err) {
 		return fmt.Errorf("repository '%s' needs to be indexed first. Open swamp to do it", repoName)
 	}
 
-	rs.ExportEnv()
-	idx, err := rindex.NewOffline(indexPath, globalOptions.Repo, globalOptions.Password)
+	idx, err := rindex.NewOffline(indexPath, rs.Repository, rs.Password)
 	if err != nil {
 		return err
 	}
@@ -280,4 +292,14 @@ func doSearch(c *cli.Context) error {
 	fmt.Printf("Results: %d\n", count)
 
 	return err
+}
+
+func repoDirFor(name string) string {
+	for _, r := range config.Get().ListRepositories() {
+		if r.Name == name {
+			return filepath.Join(paths.RepositoriesDir(), r.ID)
+		}
+	}
+
+	return ""
 }

@@ -11,8 +11,9 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gio"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/logger"
-	"github.com/swampapp/swamp/internal/settings"
+	"github.com/swampapp/swamp/internal/paths"
 )
 
 var imageCloud, imageCompressed, imageOther, imageImage, imageAudio, imageVideo, imageDoc *gdk.Pixbuf
@@ -28,7 +29,7 @@ func InitResources() {
 	}
 	defer f.Close()
 
-	rpath := filepath.Join(settings.DataDir(), "res.gresource")
+	rpath := filepath.Join(paths.DataDir(), "res.gresource")
 	out, err := os.Create(rpath)
 	if err != nil {
 		panic(fmt.Errorf("error creating res.gresource: %v", err))
@@ -89,7 +90,7 @@ func ImageForDoc(name string) *gdk.Pixbuf {
 func Pixbuf(path string) *gdk.Pixbuf {
 	// FIXME: hack, how do we detect a dark theme reliably?
 	accent := "light"
-	if settings.IsDarkMode() {
+	if config.Get().IsDarkMode() {
 		accent = "dark"
 	}
 	rpath := fmt.Sprintf("/images/%s/%s", accent, path)
@@ -102,7 +103,7 @@ func Pixbuf(path string) *gdk.Pixbuf {
 
 func UpdateImageFromResource(img *gtk.Image, path string) {
 	accent := "light"
-	if settings.IsDarkMode() {
+	if config.Get().IsDarkMode() {
 		accent = "dark"
 	}
 	rpath := fmt.Sprintf("/images/%s/%s", accent, path)
@@ -111,7 +112,7 @@ func UpdateImageFromResource(img *gtk.Image, path string) {
 
 func Image(path string) *gtk.Image {
 	accent := "light"
-	if settings.IsDarkMode() {
+	if config.Get().IsDarkMode() {
 		accent = "dark"
 	}
 	rpath := fmt.Sprintf("/images/%s/%s", accent, path)
