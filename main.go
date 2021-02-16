@@ -69,4 +69,6 @@ func activate(app *gtk.Application) {
 	w, _ := mainwindow.New(app)
 	w.ShowAll()
 	app.AddWindow(w)
+	w.Connect("destroy", func() {
+	})
 }
