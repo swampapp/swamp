@@ -37,12 +37,6 @@ type MainWindow struct {
 	indexerUI      *indexer.Indexer
 }
 
-var mw *MainWindow
-
-func Instance() *MainWindow {
-	return mw
-}
-
 func New(a *gtk.Application) (*MainWindow, error) {
 	w, err := gtk.ApplicationWindowNew(a)
 	if err != nil {
@@ -58,7 +52,7 @@ func New(a *gtk.Application) (*MainWindow, error) {
 		config.Get().SetDarkMode(true)
 	}
 
-	mw = &MainWindow{
+	mw := &MainWindow{
 		Component:         component.New("/ui/mainwindow"),
 		ApplicationWindow: *w,
 		appMenu:           appmenu.New(),
