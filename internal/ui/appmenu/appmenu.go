@@ -5,6 +5,7 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/swampapp/swamp/internal/downloader"
+	"github.com/swampapp/swamp/internal/eventbus"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/ui/component"
@@ -31,7 +32,11 @@ func New() *AppMenu {
 
 	sw := a.GladeWidget("appMenuSW").(*gtk.ScrolledWindow)
 	sw.Add(a.treeView)
-	downloader.Instance().AddObserver(a)
+
+	eventbus.ListenTo(
+		downloader.DownloadFinishedEvent,
+		a.downloadFinished,
+	)
 
 	a.Box.Add(reposelector.New())
 
@@ -148,7 +153,7 @@ func (a *AppMenu) Name() string {
 }
 
 // Implements interface to listen for downloader events
-func (a *AppMenu) NotifyCallback(evt downloader.DownloadEvent) {
+func (a *AppMenu) downloadFinished(evt *eventbus.Event) {
 	l := downloader.Instance().InProgress()
 	glib.IdleAdd(func() {
 		iter, _ := a.listStore.GetIterFromString("3:3")

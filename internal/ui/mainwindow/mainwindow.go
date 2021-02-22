@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/downloader"
+	"github.com/swampapp/swamp/internal/eventbus"
 	indexerd "github.com/swampapp/swamp/internal/indexer"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
@@ -119,7 +120,6 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	mw.StopDownloading()
 	mw.StopIndexing()
 	mw.appMenu.SelectPath("0")
-	//mw.SetMainPanel("Search")
 
 	streamer.OnStartStreaming(mw.StartDownloading)
 	streamer.OnStopStreaming(mw.StopDownloading)
@@ -130,7 +130,15 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	status.OnSetRight(mw.SetStatusRight)
 	status.OnSet(mw.SetStatus)
 
-	downloader.Instance().AddObserver(mw)
+	eventbus.ListenTo(
+		downloader.DownloadStartedEvent,
+		mw.downloadStarted,
+	)
+
+	eventbus.ListenTo(
+		downloader.QueueEmptyEvent,
+		mw.downloadQueueEmpty,
+	)
 
 	return mw, nil
 }
@@ -236,13 +244,11 @@ func (w *MainWindow) Name() string {
 	return "File List observer"
 }
 
-func (w *MainWindow) NotifyCallback(evt downloader.DownloadEvent) {
-	switch evt.Type {
-	case downloader.EventStart:
-		w.StartDownloading()
-		w.SetStatus("Downloading files...")
-	case downloader.EventError:
-	case downloader.EventQueueEmpty:
-		w.StopDownloading()
-	}
+func (w *MainWindow) downloadStarted(evt *eventbus.Event) {
+	w.StartDownloading()
+	w.SetStatus("Downloading files...")
+}
+
+func (w *MainWindow) downloadQueueEmpty(evt *eventbus.Event) {
+	w.StopDownloading()
 }

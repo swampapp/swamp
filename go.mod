@@ -15,8 +15,10 @@ require (
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/muesli/reflow v0.2.1-0.20201103142440-d06e0479f1e5
 	github.com/muesli/termenv v0.7.4
+	github.com/mustafaturan/bus v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/procfs v0.2.0
+	github.com/rs/xid v1.2.1 // indirect
 	github.com/rs/zerolog v1.20.1-0.20201129091356-29d8dac5e875
 	github.com/rubiojr/rapi v0.0.0-20210207130800-0aa798817d93
 	github.com/rubiojr/rindex v0.0.0-20210207144532-44001bab5322
