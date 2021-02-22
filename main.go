@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
-	"github.com/arl/statsviz"
+	_ "net/http/pprof"
+
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
@@ -28,6 +30,10 @@ func main() {
 		}
 	}
 
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6061", nil))
+	}()
+
 	err := paths.Initialize()
 	if err != nil {
 		panic(fmt.Errorf("error initializing paths: %w", err))
@@ -39,11 +45,6 @@ func main() {
 	}
 
 	resources.InitResources()
-
-	statsviz.RegisterDefault()
-	go func() {
-		logger.Print(http.ListenAndServe("localhost:6061", nil))
-	}()
 
 	logger.Print("starting app")
 
