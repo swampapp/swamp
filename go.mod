@@ -2,8 +2,6 @@ module github.com/swampapp/swamp
 
 go 1.16
 
-replace github.com/gotk3/gotk3 => github.com/rubiojr/gotk3 v0.6.1-0.20210116142446-e7c4bc251504
-
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20200131002437-cf55d5288a48
 	github.com/Jeffail/tunny v0.0.0-20190930221602-f13eb662a36a
@@ -12,7 +10,7 @@ require (
 	github.com/briandowns/spinner v1.11.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gofiber/fiber/v2 v2.4.1
-	github.com/gotk3/gotk3 v0.5.2-0.20201210053409-82632d18c6e1
+	github.com/gotk3/gotk3 v0.5.3-0.20210220170826-b95ec7074412
 	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/muesli/reflow v0.2.1-0.20201103142440-d06e0479f1e5
