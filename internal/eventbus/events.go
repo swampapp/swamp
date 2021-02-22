@@ -1,3 +1,0 @@
-package eventbus
-
-const ()
