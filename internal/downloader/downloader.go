@@ -25,7 +25,7 @@ import (
 var QueueEmptyEvent = "downloader.queue_empty"
 var DownloadStartedEvent = "downloader.download_started"
 var DownloadFailedEvent = "downloader.download_failed"
-var DownloadFinishedEvent = "downloader.download_failed"
+var DownloadFinishedEvent = "downloader.download_finished"
 
 type Document struct {
 	index.Document

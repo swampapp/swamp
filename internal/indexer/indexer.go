@@ -1,6 +1,7 @@
 package indexer
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net"
@@ -15,9 +16,13 @@ import (
 	"github.com/rubiojr/rindex"
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/credentials"
+	"github.com/swampapp/swamp/internal/eventbus"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/paths"
 )
+
+var IndexingStartedEvent = "indexer.indexing_started"
+var IndexingStoppedEvent = "indexer.indexing_stopped"
 
 type Indexer struct {
 	running          bool
@@ -45,16 +50,17 @@ func (i *Indexer) toggleState() {
 	if IsRunning() && !i.running {
 		i.running = true
 		logger.Print("indexer: running, notify start")
-		i.notifyStart()
+		eventbus.Emit(context.Background(), IndexingStartedEvent, nil)
 	} else if !IsRunning() && i.running {
 		i.running = false
 		logger.Print("indexer: stopped, notify stop")
-		i.notifyStop()
+		eventbus.Emit(context.Background(), IndexingStoppedEvent, nil)
 	}
 }
 
 func Daemon() *Indexer {
 	once.Do(func() {
+		eventbus.RegisterTopics(IndexingStartedEvent, IndexingStoppedEvent)
 		instance = New()
 		go func() {
 			logger.Print("indexer: starting swampd for the first time")
@@ -92,7 +98,7 @@ func (i *Indexer) Start() {
 		prepo := config.Get().PreferredRepo()
 		rs := credentials.New(prepo)
 
-		i.notifyStart()
+		eventbus.Emit(context.Background(), IndexingStartedEvent, nil)
 
 		for {
 			if !credentials.FirstBoot() {
@@ -104,7 +110,7 @@ func (i *Indexer) Start() {
 		}
 
 		defer func() {
-			i.notifyStop()
+			eventbus.Emit(context.Background(), IndexingStoppedEvent, nil)
 			logger.Print("indexer: stopped swampd")
 		}()
 
@@ -143,9 +149,6 @@ func (i *Indexer) Stop() error {
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		logger.Error(err, "unhandled error reading body")
-		if !IsRunning() {
-			i.notifyStop()
-		}
 	}
 	return err
 }
@@ -163,30 +166,6 @@ func IsRunning() bool {
 		logger.Error(err, "unhandled error reading body")
 	}
 	return string(b) == "pong"
-}
-
-// FIXME: not thread safe. Use sync.Map or something similar to hold
-// the callbacks
-func (i *Indexer) OnStart(fn OnStartCb) {
-	i.onStartListeners = append(i.onStartListeners, fn)
-}
-
-func (i *Indexer) notifyStart() {
-	for _, f := range i.onStartListeners {
-		f()
-	}
-}
-
-// FIXME: not thread safe. Use sync.Map or something similar to hold
-// the callbacks
-func (i *Indexer) OnStop(fn OnStopCb) {
-	i.onStopListeners = append(i.onStopListeners, fn)
-}
-
-func (i *Indexer) notifyStop() {
-	for _, f := range i.onStopListeners {
-		f()
-	}
 }
 
 func Client() *http.Client {

@@ -124,8 +124,19 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	streamer.OnStartStreaming(mw.StartDownloading)
 	streamer.OnStopStreaming(mw.StopDownloading)
 
-	indexerd.Daemon().OnStart(mw.StartIndexing)
-	indexerd.Daemon().OnStop(mw.StopIndexing)
+	eventbus.ListenTo(
+		indexerd.IndexingStartedEvent,
+		func(*eventbus.Event) {
+			mw.StartIndexing()
+		},
+	)
+
+	eventbus.ListenTo(
+		indexerd.IndexingStoppedEvent,
+		func(*eventbus.Event) {
+			mw.StopIndexing()
+		},
+	)
 
 	status.OnSetRight(mw.SetStatusRight)
 	status.OnSet(mw.SetStatus)
