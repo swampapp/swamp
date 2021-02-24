@@ -1,9 +1,17 @@
 .blacklbl {
-    background-color: black
+    background-color: black;
+    color: #ff6300;
+    font-weight: bold;
 }
 
 .indexingIMG {
     background-color: black
+}
+
+.indexingStats {
+    background-color: black;
+    color: #ffae00;
+    font-weight: bold;
 }
 
 progressbar {
@@ -12,20 +20,20 @@ progressbar {
 
 progressbar text {
     background-color: black;
-    color: #2accfc;
+    color: #ff6300;
     margin-bottom: 5px;
 }
 
 progressbar trough.empty {
     min-height: 12px;
-    border-color: #2accfc;
+    border-color: #ff6300;
     background-color: black;
 }
 
 progressbar trough.full {
     min-height: 12px;
-    border-color: #2accfc;
-    background-color: #2accfc;
+    border-color: #ff6300;
+    background-color: #ff6300;
 }
 
 progressbar trough {
@@ -34,10 +42,10 @@ progressbar trough {
 }
 
 progressbar progress {
-    color: #2accfc;
-    background-color: #2accfc;
+    color: #ff6300;
+    background-color: #ff6300;
     min-height: 12px;
-    border-color: #2accfc;
+    border-color: #ff6300;
 }
 
 .assistant-page-1 {
