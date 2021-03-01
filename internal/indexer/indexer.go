@@ -25,14 +25,9 @@ var IndexingStartedEvent = "indexer.indexing_started"
 var IndexingStoppedEvent = "indexer.indexing_stopped"
 
 type Indexer struct {
-	running          bool
-	onStopListeners  []OnStopCb
-	onStartListeners []OnStartCb
-	mutex            sync.Mutex
+	running bool
+	mutex   sync.Mutex
 }
-
-type OnStopCb func()
-type OnStartCb func()
 
 var clientOnce, once sync.Once
 var instance *Indexer
