@@ -23,6 +23,6 @@ require (
 	github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/vmihailenco/msgpack/v5 v5.1.0
-	github.com/zalando/go-keyring v0.1.0
+	github.com/zalando/go-keyring v0.1.1
 	gopkg.in/yaml.v2 v2.3.0
 )
