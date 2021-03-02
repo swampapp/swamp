@@ -93,8 +93,6 @@ func (i *Indexer) Start() {
 		prepo := config.Get().PreferredRepo()
 		rs := credentials.New(prepo)
 
-		eventbus.Emit(context.Background(), IndexingStartedEvent, nil)
-
 		for {
 			if !credentials.FirstBoot() {
 				logger.Print("indexer: no first boot")
@@ -105,7 +103,6 @@ func (i *Indexer) Start() {
 		}
 
 		defer func() {
-			eventbus.Emit(context.Background(), IndexingStoppedEvent, nil)
 			logger.Print("indexer: stopped swampd")
 		}()
 

@@ -35,7 +35,9 @@ func RegisterTopics(topics ...string) {
 
 func Emit(ctx context.Context, topic string, data interface{}) {
 	_, err := ebus.Emit(ctx, topic, data)
-	logger.Errorf(err, "error emitting event for %s", topic)
+	if err != nil {
+		logger.Errorf(err, "error emitting event for %s", topic)
+	}
 }
 
 func ListenTo(topic string, handler func(evt *Event)) {
@@ -45,5 +47,6 @@ func ListenTo(topic string, handler func(evt *Event)) {
 		},
 		Matcher: topic,
 	}
-	ebus.RegisterHandler(topic, h)
+	hid := xid.New().String()
+	ebus.RegisterHandler(hid, h)
 }
