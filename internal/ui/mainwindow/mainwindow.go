@@ -111,11 +111,15 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	pane.Add2(mw.fileList)
 	pane.SetPosition(230)
 
-	taglist.TagSelectedEvent("taglist", func(tag string) {
-		mw.searchText = "tag:" + tag
-		mw.appMenu.SelectPath("0")
-		mw.searchText = ""
-	})
+	eventbus.ListenTo(
+		taglist.TagSelectedEvent,
+		func(evt *eventbus.Event) {
+			tag := evt.Data.(string)
+			mw.searchText = "tag:" + tag
+			mw.appMenu.SelectPath("0")
+			mw.searchText = ""
+		},
+	)
 
 	mw.StopDownloading()
 	mw.StopIndexing()
