@@ -142,8 +142,19 @@ func New(a *gtk.Application) (*MainWindow, error) {
 		},
 	)
 
-	status.OnSetRight(mw.SetStatusRight)
-	status.OnSet(mw.SetStatus)
+	eventbus.ListenTo(
+		status.SetEvent,
+		func(evt *eventbus.Event) {
+			mw.SetStatus(evt.Data.(string))
+		},
+	)
+
+	eventbus.ListenTo(
+		status.SetRightEvent,
+		func(evt *eventbus.Event) {
+			mw.SetStatusRight(evt.Data.(string))
+		},
+	)
 
 	eventbus.ListenTo(
 		downloader.DownloadStartedEvent,
