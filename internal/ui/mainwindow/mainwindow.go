@@ -125,8 +125,19 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	mw.StopIndexing()
 	mw.appMenu.SelectPath("0")
 
-	streamer.OnStartStreaming(mw.StartDownloading)
-	streamer.OnStopStreaming(mw.StopDownloading)
+	eventbus.ListenTo(
+		streamer.StreamingStarted,
+		func(*eventbus.Event) {
+			mw.StartDownloading()
+		},
+	)
+
+	eventbus.ListenTo(
+		streamer.StreamingStopped,
+		func(*eventbus.Event) {
+			mw.StopDownloading()
+		},
+	)
 
 	eventbus.ListenTo(
 		indexerd.IndexingStartedEvent,
