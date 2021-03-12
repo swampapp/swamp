@@ -38,7 +38,12 @@ func New() *AppMenu {
 
 	eventbus.ListenTo(
 		downloader.DownloadFinishedEvent,
-		a.downloadFinished,
+		a.downloadEvent,
+	)
+
+	eventbus.ListenTo(
+		downloader.DownloadStartedEvent,
+		a.downloadEvent,
 	)
 
 	a.Box.Add(reposelector.New())
@@ -149,7 +154,7 @@ func (a *AppMenu) SelectPath(p string) {
 }
 
 // Implements interface to listen for downloader events
-func (a *AppMenu) downloadFinished(evt *eventbus.Event) {
+func (a *AppMenu) downloadEvent(evt *eventbus.Event) {
 	l := downloader.Instance().InProgress()
 	glib.IdleAdd(func() {
 		iter, _ := a.listStore.GetIterFromString("3:3")
