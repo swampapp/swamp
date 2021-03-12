@@ -4,9 +4,7 @@ Swamp uses a lightweight wrapper for [a lightweight event bus](https://github.co
 
 Each UI component may emit its own events and listen to other component events.
 
-The events are processed synchronously (bus module design choice), so handlers processing events that may take a while should use goroutines or it'll block the UI.
-
-I may enhance bus to handle events asynchronously eventually, but synchronous processing + goroutines works for now.
+The events are processed synchronously (upstream design choice), so handlers processing events that may take a while should use goroutines or it could freeze the UI.
 
 ## Singleton Bus
 
@@ -40,3 +38,5 @@ func beAwesome() {
 	eventbus.Emit(context.Background(), MyAwesomeEvent, "sample-payload")
 }
 ```
+
+`grep eventbus intenal/* -r` to find some usage examples.
