@@ -1,6 +1,8 @@
 package appmenu
 
 import (
+	"context"
+
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
@@ -16,10 +18,11 @@ import (
 type AppMenu struct {
 	*component.Component
 	*gtk.Box
-	treeView         *gtk.TreeView
-	listStore        *gtk.ListStore
-	selectionHandler func(string)
+	treeView  *gtk.TreeView
+	listStore *gtk.ListStore
 }
+
+var SelectionChangedEvent = "appmenu.selection_changed"
 
 func (a *AppMenu) Widget() gtk.IWidget {
 	return a.Box
@@ -40,11 +43,9 @@ func New() *AppMenu {
 
 	a.Box.Add(reposelector.New())
 
-	return a
-}
+	eventbus.RegisterTopics(SelectionChangedEvent)
 
-func (a *AppMenu) OnSelectionChanged(fn func(string)) {
-	a.selectionHandler = fn
+	return a
 }
 
 // Handler of "changed" signal of TreeView's selection
@@ -58,7 +59,7 @@ func (a *AppMenu) selectionChanged(s *gtk.TreeSelection) {
 		iter, _ := a.listStore.GetIter(path)
 		value, _ := a.listStore.GetValue(iter, 1)
 		str, _ := value.GetString()
-		a.selectionHandler(str)
+		eventbus.Emit(context.Background(), SelectionChangedEvent, str)
 	}
 }
 

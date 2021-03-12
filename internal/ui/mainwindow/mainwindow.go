@@ -68,7 +68,13 @@ func New(a *gtk.Application) (*MainWindow, error) {
 
 	mw.paned = mw.GladeWidget("content_panel").(*gtk.Paned)
 
-	mw.appMenu.OnSelectionChanged(mw.SetMainPanel)
+	eventbus.ListenTo(
+		appmenu.SelectionChangedEvent,
+		func(evt *eventbus.Event) {
+			sel := evt.Data.(string)
+			mw.SetMainPanel(sel)
+		},
+	)
 
 	w.SetTitle("Swamp")
 	w.SetDefaultSize(1024, 600)
