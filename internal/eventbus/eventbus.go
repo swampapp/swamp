@@ -1,3 +1,5 @@
+// Package eventbus is a thin wrapper around mustafaturan/bus to provide
+// a singleton event bus swamp can use.
 package eventbus
 
 import (
@@ -40,6 +42,8 @@ func Emit(ctx context.Context, topic string, data interface{}) {
 	}
 }
 
+// Thin wrapper around bus.RegisterHandler that takes care of
+// generating a unique handler ID for each listener
 func ListenTo(topic string, handler func(evt *Event)) {
 	h := &bus.Handler{
 		Handle: func(e *bus.Event) {
