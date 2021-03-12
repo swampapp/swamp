@@ -5,7 +5,7 @@ package eventbus
 import (
 	"context"
 
-	"github.com/mustafaturan/bus"
+	"github.com/mustafaturan/bus/v2"
 	"github.com/rs/xid"
 	"github.com/swampapp/swamp/internal/logger"
 )
@@ -46,7 +46,7 @@ func Emit(ctx context.Context, topic string, data interface{}) {
 // generating a unique handler ID for each listener
 func ListenTo(topic string, handler func(evt *Event)) {
 	h := &bus.Handler{
-		Handle: func(e *bus.Event) {
+		Handle: func(ctx context.Context, e *bus.Event) {
 			handler(&Event{e.Data})
 		},
 		Matcher: topic,
