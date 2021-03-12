@@ -55,7 +55,7 @@ func (i *Indexer) toggleState() {
 
 func Daemon() *Indexer {
 	once.Do(func() {
-		eventbus.RegisterTopics(IndexingStartedEvent, IndexingStoppedEvent)
+		eventbus.RegisterEvents(IndexingStartedEvent, IndexingStoppedEvent)
 		instance = New()
 		go func() {
 			logger.Print("indexer: starting swampd for the first time")

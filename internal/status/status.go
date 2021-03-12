@@ -11,7 +11,7 @@ var SetEvent = "status.set"
 var ErrorEvent = "status.error"
 
 func init() {
-	eventbus.RegisterTopics(SetRightEvent, ErrorEvent, SetEvent)
+	eventbus.RegisterEvents(SetRightEvent, ErrorEvent, SetEvent)
 }
 
 func Error(text string) {

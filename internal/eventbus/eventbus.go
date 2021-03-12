@@ -31,7 +31,7 @@ func init() {
 	}
 }
 
-func RegisterTopics(topics ...string) {
+func RegisterEvents(topics ...string) {
 	ebus.RegisterTopics(topics...)
 }
 

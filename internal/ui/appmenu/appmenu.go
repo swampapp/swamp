@@ -22,7 +22,7 @@ type AppMenu struct {
 	listStore *gtk.ListStore
 }
 
-var SelectionChangedEvent = "appmenu.selection_changed"
+const SelectionChangedEvent = "appmenu.selection_changed"
 
 func (a *AppMenu) Widget() gtk.IWidget {
 	return a.Box
@@ -48,7 +48,7 @@ func New() *AppMenu {
 
 	a.Box.Add(reposelector.New())
 
-	eventbus.RegisterTopics(SelectionChangedEvent)
+	eventbus.RegisterEvents(SelectionChangedEvent)
 
 	return a
 }

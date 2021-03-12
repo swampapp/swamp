@@ -17,7 +17,7 @@ var (
 )
 
 func init() {
-	eventbus.RegisterTopics(StreamingStarted, StreamingStopped)
+	eventbus.RegisterEvents(StreamingStarted, StreamingStopped)
 }
 
 func Stream(fileID string) error {

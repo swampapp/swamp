@@ -44,7 +44,7 @@ func New() *TagList {
 	filelistSW := t.GladeWidget("taglistSW").(*gtk.ScrolledWindow)
 	t.setup()
 	filelistSW.Add(t.treeView)
-	eventbus.RegisterTopics(TagSelectedEvent)
+	eventbus.RegisterEvents(TagSelectedEvent)
 
 	return t
 }

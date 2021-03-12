@@ -55,7 +55,7 @@ var dcache *leveldb.DB
 
 func Instance() *Downloader {
 	once.Do(func() {
-		eventbus.RegisterTopics(QueueEmptyEvent, DownloadStartedEvent, DownloadFailedEvent, DownloadFinishedEvent)
+		eventbus.RegisterEvents(QueueEmptyEvent, DownloadStartedEvent, DownloadFailedEvent, DownloadFinishedEvent)
 
 		var err error
 		dcache, err = leveldb.OpenFile(filepath.Join(paths.DownloadsDir(), "index"), nil)
