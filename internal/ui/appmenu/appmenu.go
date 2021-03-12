@@ -149,11 +149,6 @@ func (a *AppMenu) SelectPath(p string) {
 }
 
 // Implements interface to listen for downloader events
-func (a *AppMenu) Name() string {
-	return "App Menu observer"
-}
-
-// Implements interface to listen for downloader events
 func (a *AppMenu) downloadFinished(evt *eventbus.Event) {
 	l := downloader.Instance().InProgress()
 	glib.IdleAdd(func() {

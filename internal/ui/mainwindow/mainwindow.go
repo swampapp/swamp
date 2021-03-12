@@ -283,10 +283,6 @@ func (w *MainWindow) StopIndexing() {
 	})
 }
 
-func (w *MainWindow) Name() string {
-	return "File List observer"
-}
-
 func (w *MainWindow) downloadStarted(evt *eventbus.Event) {
 	w.StartDownloading()
 	w.SetStatus("Downloading files...")
