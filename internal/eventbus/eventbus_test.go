@@ -9,7 +9,7 @@ import (
 func TestListenMultiple(t *testing.T) {
 	topic := "foobar"
 
-	RegisterTopics(topic)
+	RegisterEvents(topic)
 
 	l1, l2 := false, false
 
