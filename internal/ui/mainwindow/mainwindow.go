@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/swampapp/swamp/internal/downloader"
+	"github.com/swampapp/swamp/internal/eventbus"
 	indexerd "github.com/swampapp/swamp/internal/indexer"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
@@ -67,7 +68,13 @@ func New(a *gtk.Application) (*MainWindow, error) {
 
 	mw.paned = mw.GladeWidget("content_panel").(*gtk.Paned)
 
-	mw.appMenu.OnSelectionChanged(mw.SetMainPanel)
+	eventbus.ListenTo(
+		appmenu.SelectionChangedEvent,
+		func(evt *eventbus.Event) {
+			sel := evt.Data.(string)
+			mw.SetMainPanel(sel)
+		},
+	)
 
 	w.SetTitle("Swamp")
 	w.SetDefaultSize(1024, 600)
@@ -110,27 +117,71 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	pane.Add2(mw.fileList)
 	pane.SetPosition(230)
 
-	taglist.TagSelectedEvent("taglist", func(tag string) {
-		mw.searchText = "tag:" + tag
-		mw.appMenu.SelectPath("0")
-		mw.searchText = ""
-	})
+	eventbus.ListenTo(
+		taglist.TagSelectedEvent,
+		func(evt *eventbus.Event) {
+			tag := evt.Data.(string)
+			mw.searchText = "tag:" + tag
+			mw.appMenu.SelectPath("0")
+			mw.searchText = ""
+		},
+	)
 
 	mw.StopDownloading()
 	mw.StopIndexing()
 	mw.appMenu.SelectPath("0")
-	//mw.SetMainPanel("Search")
 
-	streamer.OnStartStreaming(mw.StartDownloading)
-	streamer.OnStopStreaming(mw.StopDownloading)
+	eventbus.ListenTo(
+		streamer.StreamingStarted,
+		func(*eventbus.Event) {
+			mw.StartDownloading()
+		},
+	)
 
-	indexerd.Daemon().OnStart(mw.StartIndexing)
-	indexerd.Daemon().OnStop(mw.StopIndexing)
+	eventbus.ListenTo(
+		streamer.StreamingStopped,
+		func(*eventbus.Event) {
+			mw.StopDownloading()
+		},
+	)
 
-	status.OnSetRight(mw.SetStatusRight)
-	status.OnSet(mw.SetStatus)
+	eventbus.ListenTo(
+		indexerd.IndexingStartedEvent,
+		func(*eventbus.Event) {
+			mw.StartIndexing()
+		},
+	)
 
-	downloader.Instance().AddObserver(mw)
+	eventbus.ListenTo(
+		indexerd.IndexingStoppedEvent,
+		func(*eventbus.Event) {
+			mw.StopIndexing()
+		},
+	)
+
+	eventbus.ListenTo(
+		status.SetEvent,
+		func(evt *eventbus.Event) {
+			mw.SetStatus(evt.Data.(string))
+		},
+	)
+
+	eventbus.ListenTo(
+		status.SetRightEvent,
+		func(evt *eventbus.Event) {
+			mw.SetStatusRight(evt.Data.(string))
+		},
+	)
+
+	eventbus.ListenTo(
+		downloader.DownloadStartedEvent,
+		mw.downloadStarted,
+	)
+
+	eventbus.ListenTo(
+		downloader.QueueEmptyEvent,
+		mw.downloadQueueEmpty,
+	)
 
 	return mw, nil
 }
@@ -232,17 +283,11 @@ func (w *MainWindow) StopIndexing() {
 	})
 }
 
-func (w *MainWindow) Name() string {
-	return "File List observer"
+func (w *MainWindow) downloadStarted(evt *eventbus.Event) {
+	w.StartDownloading()
+	w.SetStatus("Downloading files...")
 }
 
-func (w *MainWindow) NotifyCallback(evt downloader.DownloadEvent) {
-	switch evt.Type {
-	case downloader.EventStart:
-		w.StartDownloading()
-		w.SetStatus("Downloading files...")
-	case downloader.EventError:
-	case downloader.EventQueueEmpty:
-		w.StopDownloading()
-	}
+func (w *MainWindow) downloadQueueEmpty(evt *eventbus.Event) {
+	w.StopDownloading()
 }

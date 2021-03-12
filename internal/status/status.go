@@ -1,39 +1,27 @@
 package status
 
-import "fmt"
+import (
+	"context"
+
+	"github.com/swampapp/swamp/internal/eventbus"
+)
+
+var SetRightEvent = "status.set_right"
+var SetEvent = "status.set"
+var ErrorEvent = "status.error"
+
+func init() {
+	eventbus.RegisterEvents(SetRightEvent, ErrorEvent, SetEvent)
+}
 
 func Error(text string) {
-	if onError != nil {
-		onError(fmt.Sprintf("🛑 %s", text))
-	}
+	eventbus.Emit(context.Background(), ErrorEvent, text)
 }
 
 func Set(text string) {
-	if onSet != nil {
-		onSet(text)
-	}
+	eventbus.Emit(context.Background(), SetEvent, text)
 }
 
 func SetRight(text string) {
-	if onSetRight != nil {
-		onSetRight(text)
-	}
-}
-
-var onSetRight func(string)
-
-func OnSetRight(fn func(string)) {
-	onSetRight = fn
-}
-
-var onError func(string)
-
-func OnError(fn func(string)) {
-	onError = fn
-}
-
-var onSet func(string)
-
-func OnSet(fn func(string)) {
-	onSet = fn
+	eventbus.Emit(context.Background(), SetRightEvent, text)
 }

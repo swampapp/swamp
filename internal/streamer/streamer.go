@@ -6,9 +6,19 @@ import (
 	"os/exec"
 
 	"github.com/gotk3/gotk3/glib"
+	"github.com/swampapp/swamp/internal/eventbus"
 	"github.com/swampapp/swamp/internal/index"
 	"github.com/swampapp/swamp/internal/logger"
 )
+
+var (
+	StreamingStarted = "streamer.starteds"
+	StreamingStopped = "streamer.stopped"
+)
+
+func init() {
+	eventbus.RegisterEvents(StreamingStarted, StreamingStopped)
+}
 
 func Stream(fileID string) error {
 	idx, err := index.Client()
@@ -34,15 +44,13 @@ func Stream(fileID string) error {
 
 	go func() {
 		glib.IdleAdd(func() {
-			if onStartStreaming != nil {
-				onStartStreaming()
-			}
+			eventbus.Emit(context.Background(), StreamingStarted, nil)
 		})
+
 		defer glib.IdleAdd(func() {
-			if onStopStreaming != nil {
-				onStopStreaming()
-			}
+			eventbus.Emit(context.Background(), StreamingStopped, nil)
 		})
+
 		err = idx.Fetch(ctx, fileID, stdin)
 		if err != nil && err != context.Canceled {
 			logger.Error(err, "error streaming file")
@@ -71,15 +79,4 @@ func findPlayer() (*exec.Cmd, error) {
 	}
 
 	return cmd, nil
-}
-
-var onStartStreaming func()
-var onStopStreaming func()
-
-func OnStartStreaming(fn func()) {
-	onStartStreaming = fn
-}
-
-func OnStopStreaming(fn func()) {
-	onStopStreaming = fn
 }

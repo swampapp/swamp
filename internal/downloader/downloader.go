@@ -15,31 +15,22 @@ import (
 
 	"github.com/Jeffail/tunny"
 
+	"github.com/swampapp/swamp/internal/eventbus"
 	"github.com/swampapp/swamp/internal/index"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/paths"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
-type EventType uint8
+var QueueEmptyEvent = "downloader.queue_empty"
+var DownloadStartedEvent = "downloader.download_started"
+var DownloadFailedEvent = "downloader.download_failed"
+var DownloadFinishedEvent = "downloader.download_finished"
 
 type Document struct {
 	index.Document
 	DateTime time.Time
 }
-
-type Observer interface {
-	NotifyCallback(event DownloadEvent)
-	Name() string
-}
-
-const (
-	EventStart EventType = iota
-	EventStop
-	EventFinished
-	EventQueueEmpty
-	EventError
-)
 
 var once sync.Once
 var instance *Downloader
@@ -49,14 +40,8 @@ const maxWorkers = 5
 var m = &sync.Mutex{}
 
 type Downloader struct {
-	observers  sync.Map
 	pool       *tunny.Pool
 	inProgress []Document
-}
-
-type DownloadEvent struct {
-	Type   EventType
-	FileID string
 }
 
 type downloadRequest struct {
@@ -70,6 +55,8 @@ var dcache *leveldb.DB
 
 func Instance() *Downloader {
 	once.Do(func() {
+		eventbus.RegisterEvents(QueueEmptyEvent, DownloadStartedEvent, DownloadFailedEvent, DownloadFinishedEvent)
+
 		var err error
 		dcache, err = leveldb.OpenFile(filepath.Join(paths.DownloadsDir(), "index"), nil)
 		if err != nil {
@@ -99,7 +86,7 @@ func Instance() *Downloader {
 
 			return err
 		})
-		instance = &Downloader{pool: pool, inProgress: []Document{}, observers: sync.Map{}}
+		instance = &Downloader{pool: pool, inProgress: []Document{}}
 	})
 
 	return instance
@@ -206,24 +193,24 @@ func (d *Downloader) downloadFileID(fileID string) error {
 	ddoc.Document = doc
 
 	d.addInProgress(ddoc)
-	d.NotifyObservers(DownloadEvent{Type: EventStart, FileID: fileID})
+	eventbus.Emit(context.Background(), DownloadStartedEvent, fileID)
 
 	idx, err := index.Client()
 	if err != nil {
-		d.NotifyObservers(DownloadEvent{Type: EventError, FileID: fileID})
+		eventbus.Emit(context.Background(), DownloadFailedEvent, fileID)
 		logger.Error(err, "error initializing the index")
 		return err
 	}
 
 	err = os.MkdirAll(filepath.Dir(dpath), 0755)
 	if err != nil {
-		d.NotifyObservers(DownloadEvent{Type: EventError, FileID: fileID})
+		eventbus.Emit(context.Background(), DownloadFailedEvent, fileID)
 		return err
 	}
 
 	dest, err := os.Create(dpath + ".tmp")
 	if err != nil {
-		d.NotifyObservers(DownloadEvent{Type: EventError, FileID: fileID})
+		eventbus.Emit(context.Background(), DownloadFailedEvent, fileID)
 		logger.Error(err, "error creating download tmp file")
 		return err
 	}
@@ -236,12 +223,13 @@ func (d *Downloader) downloadFileID(fileID string) error {
 	logger.Print("downloading ", fileID)
 	err = idx.Fetch(context.Background(), fileID, dest)
 	if err != nil {
-		d.NotifyObservers(DownloadEvent{Type: EventError, FileID: fileID})
+		eventbus.Emit(context.Background(), DownloadFailedEvent, fileID)
 		logger.Error(err, "error downloading file")
 		return err
 	}
 
 	if err := os.Rename(dest.Name(), dpath); err != nil {
+		eventbus.Emit(context.Background(), DownloadFailedEvent, fileID)
 		logger.Errorf(err, "error moving file %s to %s", dest.Name(), dpath)
 		return err
 	}
@@ -264,7 +252,7 @@ func (d *Downloader) downloadFileID(fileID string) error {
 		logger.Debug("failed to remove from in progress")
 	}
 
-	d.NotifyObservers(DownloadEvent{Type: EventFinished, FileID: fileID})
+	eventbus.Emit(context.Background(), DownloadFinishedEvent, fileID)
 	logger.Print("downloaded ", fileID)
 
 	return err
@@ -278,7 +266,7 @@ func (d *Downloader) removeInProgress(fid string) bool {
 		if item.ID == fid {
 			d.inProgress = append(d.inProgress[:i], d.inProgress[i+1:]...)
 			if len(d.inProgress) == 0 {
-				d.NotifyObservers(DownloadEvent{Type: EventQueueEmpty, FileID: fid})
+				eventbus.Emit(context.Background(), QueueEmptyEvent, nil)
 			}
 			return true
 		}
@@ -373,24 +361,4 @@ func Export(fid, name, target string) error {
 	logger.Printf("exported file %s as %s", fid, sn)
 
 	return err
-}
-
-func (d *Downloader) AddObserver(observer Observer) {
-	d.observers.Store(observer, struct{}{})
-}
-
-func (d *Downloader) RemoveObserver(observer Observer) {
-	d.observers.Delete(observer)
-}
-
-func (d *Downloader) NotifyObservers(event DownloadEvent) {
-	d.observers.Range(func(key, value interface{}) bool {
-		if key == nil {
-			return false
-		}
-
-		observer := key.(Observer)
-		observer.NotifyCallback(event)
-		return true
-	})
 }

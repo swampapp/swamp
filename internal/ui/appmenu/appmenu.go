@@ -1,10 +1,13 @@
 package appmenu
 
 import (
+	"context"
+
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/swampapp/swamp/internal/downloader"
+	"github.com/swampapp/swamp/internal/eventbus"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/ui/component"
@@ -15,10 +18,11 @@ import (
 type AppMenu struct {
 	*component.Component
 	*gtk.Box
-	treeView         *gtk.TreeView
-	listStore        *gtk.ListStore
-	selectionHandler func(string)
+	treeView  *gtk.TreeView
+	listStore *gtk.ListStore
 }
+
+const SelectionChangedEvent = "appmenu.selection_changed"
 
 func (a *AppMenu) Widget() gtk.IWidget {
 	return a.Box
@@ -31,15 +35,22 @@ func New() *AppMenu {
 
 	sw := a.GladeWidget("appMenuSW").(*gtk.ScrolledWindow)
 	sw.Add(a.treeView)
-	downloader.Instance().AddObserver(a)
+
+	eventbus.ListenTo(
+		downloader.DownloadFinishedEvent,
+		a.downloadEvent,
+	)
+
+	eventbus.ListenTo(
+		downloader.DownloadStartedEvent,
+		a.downloadEvent,
+	)
 
 	a.Box.Add(reposelector.New())
 
-	return a
-}
+	eventbus.RegisterEvents(SelectionChangedEvent)
 
-func (a *AppMenu) OnSelectionChanged(fn func(string)) {
-	a.selectionHandler = fn
+	return a
 }
 
 // Handler of "changed" signal of TreeView's selection
@@ -53,7 +64,7 @@ func (a *AppMenu) selectionChanged(s *gtk.TreeSelection) {
 		iter, _ := a.listStore.GetIter(path)
 		value, _ := a.listStore.GetValue(iter, 1)
 		str, _ := value.GetString()
-		a.selectionHandler(str)
+		eventbus.Emit(context.Background(), SelectionChangedEvent, str)
 	}
 }
 
@@ -143,12 +154,7 @@ func (a *AppMenu) SelectPath(p string) {
 }
 
 // Implements interface to listen for downloader events
-func (a *AppMenu) Name() string {
-	return "App Menu observer"
-}
-
-// Implements interface to listen for downloader events
-func (a *AppMenu) NotifyCallback(evt downloader.DownloadEvent) {
+func (a *AppMenu) downloadEvent(evt *eventbus.Event) {
 	l := downloader.Instance().InProgress()
 	glib.IdleAdd(func() {
 		iter, _ := a.listStore.GetIterFromString("3:3")

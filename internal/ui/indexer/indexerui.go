@@ -10,6 +10,7 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/rubiojr/rindex"
+	"github.com/swampapp/swamp/internal/eventbus"
 	"github.com/swampapp/swamp/internal/indexer"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
@@ -54,13 +55,19 @@ func New() *Indexer {
 
 	i.indexAnimation, _ = i.GladeWidget("indexingFlask").(*gtk.Image)
 
-	indexer.Daemon().OnStop(func() {
-		i.cancelFunc()
-	})
+	eventbus.ListenTo(
+		indexer.IndexingStoppedEvent,
+		func(*eventbus.Event) {
+			i.cancelFunc()
+		},
+	)
 
-	indexer.Daemon().OnStart(func() {
-		i.start()
-	})
+	eventbus.ListenTo(
+		indexer.IndexingStartedEvent,
+		func(*eventbus.Event) {
+			i.start()
+		},
+	)
 
 	return i
 }

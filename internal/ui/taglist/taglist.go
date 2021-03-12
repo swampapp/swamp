@@ -1,14 +1,15 @@
 package taglist
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/swampapp/swamp/internal/eventbus"
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/tags"
@@ -25,15 +26,9 @@ type TagList struct {
 	searchEntry    *gtk.SearchEntry
 }
 
-type TagSelectedObserver interface {
-	TagSelected(string)
-}
-
-type TagSelectedCallback = func(tag string)
-
-var observers sync.Map
-
 type ColID int
+
+var TagSelectedEvent = "taglist.tag_selected"
 
 const (
 	COLUMN_ICON ColID = iota
@@ -49,6 +44,7 @@ func New() *TagList {
 	filelistSW := t.GladeWidget("taglistSW").(*gtk.ScrolledWindow)
 	t.setup()
 	filelistSW.Add(t.treeView)
+	eventbus.RegisterEvents(TagSelectedEvent)
 
 	return t
 }
@@ -135,22 +131,6 @@ func (t *TagList) addTagRow(name, color string) {
 	}
 }
 
-func TagSelectedEvent(l string, cb TagSelectedCallback) {
-	observers.Store(l, cb)
-}
-
-func TagSelected(tag string) {
-	observers.Range(func(key, value interface{}) bool {
-		if key == nil {
-			return false
-		}
-
-		cb := value.(TagSelectedCallback)
-		cb(tag)
-		return true
-	})
-}
-
 func (t *TagList) isShown(tree *gtk.TreeView) {
 	t.updateFileList("*")
 	t.searchEntry.GrabFocus()
@@ -161,5 +141,5 @@ func (t *TagList) rowActivated(tree *gtk.TreeView, path *gtk.TreePath, col *gtk.
 	value, _ := t.listStore.GetValue(iter, int(COLUMN_NAME))
 	tag, _ := value.GetString()
 
-	TagSelected(tag)
+	eventbus.Emit(context.Background(), TagSelectedEvent, tag)
 }
