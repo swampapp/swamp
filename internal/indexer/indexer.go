@@ -21,8 +21,10 @@ import (
 	"github.com/swampapp/swamp/internal/paths"
 )
 
-var IndexingStartedEvent = "indexer.indexing_started"
-var IndexingStoppedEvent = "indexer.indexing_stopped"
+const (
+	IndexingStartedEvent = "indexer.indexing_started"
+	IndexingStoppedEvent = "indexer.indexing_stopped"
+)
 
 type Indexer struct {
 	running bool

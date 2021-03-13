@@ -6,9 +6,11 @@ import (
 	"github.com/swampapp/swamp/internal/eventbus"
 )
 
-var SetRightEvent = "status.set_right"
-var SetEvent = "status.set"
-var ErrorEvent = "status.error"
+const (
+	SetRightEvent = "status.set_right"
+	SetEvent      = "status.set"
+	ErrorEvent    = "status.error"
+)
 
 func init() {
 	eventbus.RegisterEvents(SetRightEvent, ErrorEvent, SetEvent)
