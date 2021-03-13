@@ -10,7 +10,7 @@ require (
 	github.com/briandowns/spinner v1.11.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gofiber/fiber/v2 v2.4.1
-	github.com/gotk3/gotk3 v0.5.3-0.20210220170826-b95ec7074412
+	github.com/gotk3/gotk3 v0.5.3-0.20210311170413-be85685ca6db
 	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/muesli/reflow v0.2.1-0.20201103142440-d06e0479f1e5

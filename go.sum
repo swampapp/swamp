@@ -221,6 +221,8 @@ github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0U
 github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/gotk3/gotk3 v0.5.3-0.20210220170826-b95ec7074412 h1:mRmjNRt1g9ECumq+LIMViUP0wveBSCBmEriTXPo719c=
 github.com/gotk3/gotk3 v0.5.3-0.20210220170826-b95ec7074412/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
+github.com/gotk3/gotk3 v0.5.3-0.20210311170413-be85685ca6db h1:6DrB5/BH3GK8Wg6VZ+C2NqQQdMof0iHifNqxixBKefk=
+github.com/gotk3/gotk3 v0.5.3-0.20210311170413-be85685ca6db/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
