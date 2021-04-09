@@ -96,7 +96,7 @@ func (t *Tagger) removeSelected() {
 
 func (t *Tagger) saveTags() {
 	var tl []tags.Tag
-	t.listStore.ForEach(func(model *gtk.TreeModel, path *gtk.TreePath, iter *gtk.TreeIter, userdata ...interface{}) bool {
+	t.listStore.ForEach(func(model *gtk.TreeModel, path *gtk.TreePath, iter *gtk.TreeIter) bool {
 		value, _ := t.listStore.GetValue(iter, 0)
 		tname, _ := value.GetString()
 		tag := tags.Tag{Name: tname}

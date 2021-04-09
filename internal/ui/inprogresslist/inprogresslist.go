@@ -57,7 +57,7 @@ func (i *InProgressList) isShown(tree *gtk.TreeView) {
 
 func (i *InProgressList) updateFileList() {
 	//TODO: use leveldb to speed things up without walking the filesystem
-	i.listBox.BindModel(nil, nil, nil)
+	i.listBox.BindModel(nil, nil)
 
 	for _, doc := range downloader.Instance().DownloadsInProgress() {
 		i.addFileRow(doc.Name)
