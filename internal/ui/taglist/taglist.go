@@ -28,7 +28,7 @@ type TagList struct {
 
 type ColID int
 
-var TagSelectedEvent = "taglist.tag_selected"
+const TagSelectedEvent = "taglist.tag_selected"
 
 const (
 	COLUMN_ICON ColID = iota
