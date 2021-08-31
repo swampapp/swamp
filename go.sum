@@ -225,6 +225,8 @@ github.com/gotk3/gotk3 v0.5.3-0.20210311170413-be85685ca6db h1:6DrB5/BH3GK8Wg6VZ
 github.com/gotk3/gotk3 v0.5.3-0.20210311170413-be85685ca6db/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
 github.com/gotk3/gotk3 v0.5.3-0.20210405165307-86f85cbecd0b h1:KXbrFonfNw1xdc2CeUWYPMir0wXr8ejQlKlClQxM1Lc=
 github.com/gotk3/gotk3 v0.5.3-0.20210405165307-86f85cbecd0b/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
+github.com/gotk3/gotk3 v0.6.2-0.20210823201509-e9bf9aa867f1 h1:V6hqnrCQpk2lqIrnBJ3nThDogpQrFt6vOBcrPfExdI8=
+github.com/gotk3/gotk3 v0.6.2-0.20210823201509-e9bf9aa867f1/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
