@@ -63,6 +63,7 @@
             <!-- statusbar -->
             <file alias="ui/statusbar/finished" compressed="true">images/dark/ui/statusbar/32/finished.svg</file>
             <file alias="ui/statusbar/indexed" compressed="true">images/dark/ui/statusbar/32/indexed.svg</file>
+            <file alias="ui/statusbar/download-failed" compressed="true">images/dark/ui/statusbar/download-failed.svg</file>
       </gresource>
 
       <gresource prefix="/images/light">
@@ -109,5 +110,6 @@
             <!-- statusbar -->
             <file alias="ui/statusbar/finished" compressed="true">images/light/ui/statusbar/32/finished.svg</file>
             <file alias="ui/statusbar/indexed" compressed="true">images/light/ui/statusbar/32/indexed.svg</file>
+            <file alias="ui/statusbar/download-failed" compressed="true">images/dark/ui/statusbar/download-failed.svg</file>
       </gresource>
 </gresources>

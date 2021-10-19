@@ -179,6 +179,16 @@ func New(a *gtk.Application) (*MainWindow, error) {
 	)
 
 	eventbus.ListenTo(
+		downloader.DownloadFailedEvent,
+		mw.downloadFailed,
+	)
+
+	eventbus.ListenTo(
+		downloader.DownloadFinishedEvent,
+		mw.downloadFinished,
+	)
+
+	eventbus.ListenTo(
 		downloader.QueueEmptyEvent,
 		mw.downloadQueueEmpty,
 	)
@@ -266,6 +276,15 @@ func (w *MainWindow) StopDownloading() {
 	})
 }
 
+func (w *MainWindow) FailedDownloading() {
+	glib.IdleAdd(func() {
+		img := w.GladeWidget("downloadingIMG").(*gtk.Image)
+		resources.UpdateImageFromResource(img, "ui/statusbar/download-failed")
+		img.SetTooltipText("Indexing documents")
+		img.Show()
+	})
+}
+
 func (w *MainWindow) StartIndexing() {
 	glib.IdleAdd(func() {
 		img := w.GladeWidget("indexingIMG").(*gtk.Image)
@@ -286,6 +305,15 @@ func (w *MainWindow) StopIndexing() {
 func (w *MainWindow) downloadStarted(evt *eventbus.Event) {
 	w.StartDownloading()
 	w.SetStatus("Downloading files...")
+}
+
+func (w *MainWindow) downloadFailed(evt *eventbus.Event) {
+	w.FailedDownloading()
+	w.SetStatus("Downloading failed!")
+}
+
+func (w *MainWindow) downloadFinished(evt *eventbus.Event) {
+	w.StopDownloading()
 }
 
 func (w *MainWindow) downloadQueueEmpty(evt *eventbus.Event) {
