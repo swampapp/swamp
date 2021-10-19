@@ -1,6 +1,8 @@
 package credentials
 
 import (
+	"os"
+
 	"github.com/swampapp/swamp/internal/config"
 	"github.com/zalando/go-keyring"
 )
@@ -29,10 +31,12 @@ func New(repoID string) *Credentials {
 	}
 	var1, _ := keyring.Get(instance.key(), "var1")
 	if err == nil {
+		os.Setenv("AWS_ACCESS_KEY", var1)
 		instance.Var1 = var1
 	}
 	var2, _ := keyring.Get(instance.key(), "var2")
 	if err == nil {
+		os.Setenv("SECRET_ACCESS_KEY", var2)
 		instance.Var2 = var2
 	}
 	return instance

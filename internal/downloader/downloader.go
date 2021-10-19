@@ -229,6 +229,7 @@ func (d *Downloader) downloadFileID(fileID string) error {
 		logger.Error(err, "error downloading file")
 		return err
 	}
+	logger.Print("done fetching ", fileID)
 
 	if err := os.Rename(dest.Name(), dpath); err != nil {
 		eventbus.Emit(context.Background(), DownloadFailedEvent, fileID)
