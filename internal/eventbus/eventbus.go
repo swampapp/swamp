@@ -36,6 +36,7 @@ func RegisterEvents(topics ...string) {
 }
 
 func Emit(ctx context.Context, topic string, data interface{}) {
+	logger.Debugf("emitting %s event", topic)
 	_, err := ebus.Emit(ctx, topic, data)
 	if err != nil {
 		logger.Errorf(err, "error emitting event for %s", topic)
