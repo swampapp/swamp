@@ -38,6 +38,7 @@ nfpms:
         dst: /usr/bin/swp
     formats:
       - deb
+      - rpm
     dependencies:
       - mpv
     bindir: /usr/bin
