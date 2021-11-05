@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/blugelabs/bluge"
 	"github.com/manifoldco/promptui"
 	"github.com/rubiojr/rapi"
 	"github.com/rubiojr/rindex"
@@ -16,19 +15,17 @@ import (
 	"github.com/swampapp/swamp/internal/logger"
 	"github.com/swampapp/swamp/internal/paths"
 	"github.com/swampapp/swamp/internal/queryparser"
+	"github.com/swampapp/swamp/internal/version"
 	"github.com/urfave/cli/v2"
 )
 
 var appCommands []*cli.Command
-var globalOptions = rapi.DefaultOptions
-var blugeConf bluge.Config
-var indexPath string
 
 func main() {
 	app := &cli.App{
 		Name:     "swp",
 		Commands: []*cli.Command{},
-		Version:  "v0.1.0",
+		Version:  fmt.Sprintf("swp v%s (%s)\n", version.APP_VERSION, version.GIT_SHA),
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:     "debug",

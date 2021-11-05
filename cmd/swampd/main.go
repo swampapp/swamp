@@ -6,6 +6,7 @@ import (
 
 	"github.com/rubiojr/rapi"
 	"github.com/swampapp/swamp/internal/logger"
+	"github.com/swampapp/swamp/internal/version"
 	"github.com/urfave/cli/v2"
 )
 
@@ -18,7 +19,7 @@ func main() {
 	app := &cli.App{
 		Name:     "swampd",
 		Commands: []*cli.Command{},
-		Version:  "v0.1.0",
+		Version:  fmt.Sprintf("swampd v%s (%s)\n", version.APP_VERSION, version.GIT_SHA),
 		Before: func(c *cli.Context) error {
 			if c.Bool("debug") {
 				logger.Init(logger.DebugLevel, "swampd")

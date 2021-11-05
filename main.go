@@ -18,6 +18,7 @@ import (
 	"github.com/swampapp/swamp/internal/resources"
 	"github.com/swampapp/swamp/internal/ui/assistant"
 	"github.com/swampapp/swamp/internal/ui/mainwindow"
+	"github.com/swampapp/swamp/internal/version"
 )
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 
 	for _, a := range os.Args {
 		if a == "-v" || a == "--version" {
-			fmt.Printf("Swamp v%s (%s)\n", APP_VERSION, GIT_SHA)
+			fmt.Printf("Swamp v%s (%s)\n", version.APP_VERSION, version.GIT_SHA)
 			os.Exit(0)
 		}
 	}
