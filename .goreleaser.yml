@@ -6,7 +6,7 @@ before:
 builds:
   - id: "swamp"
     binary: swamp 
-    ldflags: -s -w
+    ldflags: -s -w -X github.com/swampapp/swamp/internal/version.GIT_SHA={{.ShortCommit}}
     goos:
       - linux
     goarch:

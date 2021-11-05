@@ -11,13 +11,13 @@ release: swampd swamp swp
 
 ${BINNAME}: swampd swp
 	./script/compile-resources
-	go build -ldflags="-s -w -X 'main.GIT_SHA=$(shell git rev-parse --short HEAD)'" -o ${BINNAME}
+	go build -ldflags="-s -w -X 'github.com/swampapp/swamp/internal/version.GIT_SHA=$(shell git rev-parse --short HEAD)'" -o ${BINNAME}
 
 swampd:
-	go build -ldflags="-s -w -X 'main.GIT_SHA=$(shell git rev-parse --short HEAD)'" -o swampd ./cmd/swampd
+	go build -ldflags="-s -w -X 'github.com/swampapp/swamp/internal/version.GIT_SHA=$(shell git rev-parse --short HEAD)'" -o swampd ./cmd/swampd
 
 swp:
-	go build -ldflags="-s -w -X 'main.GIT_SHA=$(shell git rev-parse --short HEAD)'" -o swp ./cmd/swp
+	go build -ldflags="-s -w -X 'github.com/swampapp/swamp/internal/version.GIT_SHA=$(shell git rev-parse --short HEAD)'" -o swp ./cmd/swp
 
 clean:
 	rm -f ${BINNAME} swampd swp
