@@ -40,38 +40,16 @@ func New() *Indexer {
 	return &Indexer{}
 }
 
-func (i *Indexer) toggleState() {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
-
-	if IsRunning() && !i.running {
-		i.running = true
-		logger.Print("indexer: running, notify start")
-		eventbus.Emit(context.Background(), IndexingStartedEvent, nil)
-	} else if !IsRunning() && i.running {
-		i.running = false
-		logger.Print("indexer: stopped, notify stop")
-		eventbus.Emit(context.Background(), IndexingStoppedEvent, nil)
-	}
-}
-
 func Daemon() *Indexer {
 	once.Do(func() {
 		eventbus.RegisterEvents(IndexingStartedEvent, IndexingStoppedEvent)
 		instance = New()
 		go func() {
-			logger.Print("indexer: starting swampd for the first time")
-			instance.Start()
+			logger.Print("indexer: scheduling indexer to run every 60 mins")
 			ticker := time.NewTicker(60 * time.Minute)
 			for range ticker.C {
 				logger.Print("indexer: trying to start swampd")
 				instance.Start()
-			}
-		}()
-		go func() {
-			ticker := time.NewTicker(5 * time.Second)
-			for range ticker.C {
-				instance.toggleState()
 			}
 		}()
 	})
@@ -80,6 +58,7 @@ func Daemon() *Indexer {
 }
 
 func (i *Indexer) Start() {
+	eventbus.Emit(context.Background(), IndexingStartedEvent, nil)
 	go func() {
 		if !config.Exists() {
 			logger.Warn("indexer: configuration does not exist")
@@ -129,6 +108,7 @@ func (i *Indexer) Start() {
 		if err != nil {
 			logger.Error(err, "indexer: swampd error")
 		}
+		eventbus.Emit(context.Background(), IndexingStoppedEvent, nil)
 	}()
 }
 
@@ -137,6 +117,7 @@ func (i *Indexer) Stop() error {
 	if err != nil {
 		return err
 	}
+
 	//nolint
 	defer resp.Body.Close()
 
