@@ -1,7 +1,19 @@
 #!/bin/sh
 set -e
 
-goreleaser release --skip-publish --rm-dist --skip-validate --snapshot
+goreleaser release --skip-publish --rm-dist --skip-validate --skip-sign --snapshot
 
 echo "Installing the package..."
-sudo apt --reinstall install -y ./dist/*.deb
+dist="$(lsb_release -is)"
+case "$dist" in
+  Fedora)
+    sudo rpm -i --force ./dist/*.rpm
+    ;;
+  Ubuntu)
+    sudo apt --reinstall install -y ./dist/*.deb
+    ;;
+  *)
+    echo "Distribution '$dist' not supported."
+    exit 1
+    ;;
+esac
