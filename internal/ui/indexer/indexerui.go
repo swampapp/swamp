@@ -108,6 +108,8 @@ func (i *Indexer) start() {
 	})
 
 	go func() {
+		ticker := time.NewTicker(1 * time.Second)
+
 		for {
 			select {
 			case <-i.ctx.Done():
@@ -115,10 +117,7 @@ func (i *Indexer) start() {
 					i.stop()
 				})
 				return
-			default:
-				// give swampd some time to start
-				time.Sleep(1 * time.Second)
-
+			case <-ticker.C:
 				pstats, err := indexer.GetProcStats()
 				if err != nil {
 					logger.Error(err, "error fetching swampd procstats")
